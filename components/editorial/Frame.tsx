@@ -6,13 +6,15 @@ import { Plate, type PlateVariant } from "@/components/home/Plate";
 import { GROUND, type Ground } from "@/components/editorial/grounds";
 import { Meta } from "@/components/editorial/SectionHead";
 
-type Ratio = "portrait" | "landscape" | "wide" | "square" | "bleed";
+type Ratio = "portrait" | "landscape" | "wide" | "square" | "photo" | "bleed";
 
 const RATIO: Record<Ratio, string> = {
   portrait: "aspect-[3/4]",
   landscape: "aspect-[4/3]",
   wide: "aspect-[16/9]",
   square: "aspect-square",
+  /** 3:2 — matches a supplied photograph's native size exactly, no crop. */
+  photo: "aspect-[3/2]",
   /** Fills whatever the parent gives it — for full-viewport and pinned use. */
   bleed: "h-full",
 };

@@ -34,7 +34,7 @@ export function HumanStory({ ground = "moss", className = "" }: HumanStoryProps)
             the stickiness survives the section wrapper. */}
         <div className="lg:sticky lg:top-24">
           <Frame
-            ratio="portrait"
+            ratio={story.image ? "photo" : "portrait"}
             plate="weave"
             treatment="crop"
             mask
