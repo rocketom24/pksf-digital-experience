@@ -161,6 +161,55 @@
   }
 }
 
+/* Type set directly on the hero photograph.
+
+   The picture is a mustard field in full sun. Sampled at every ninth pixel
+   its worst case for #FFF8E8 is 1.0:1 in the top sixth and 1.0:1 in the
+   bottom eighteenth — there is nowhere on it that paper-coloured type is
+   readable unaided, and every way of fixing that at the scale of the section
+   costs the photograph: a band at each edge reads as two bars, an even grade
+   multiplies a yellow field by a green ink and turns it olive, a panel
+   simply covers the picture up.
+
+   So the hero inverts instead. The image is overwhelmingly *light*, so the
+   type is dark on it rather than pale — deep forest, the same ink the page
+   uses on parchment — and the halo is cream. That is the right way round for
+   this photograph: against the field the ink itself carries the contrast,
+   and the halo is only there for the places the picture goes dark, the
+   farmer's shawl and the shaded foreground, where it separates the
+   letterform from behind. Four stops: the inner two keep the edge crisp at
+   11px, the outer two lift the character off a busy ground.
+
+   `color` and `text-shadow` both inherit, so this goes on the section once.
+   The statement adds a real stroke on top, which large type can carry and
+   11px mono cannot. */
+.on-photo {
+  /* Charcoal rather than deep forest. Against a sunlit field the green ink
+     that reads perfectly well on parchment starts to belong to the
+     photograph; the near-black keeps the type in front of it. 13.6:1 on the
+     field's brightest pixel. */
+  color: var(--ink);
+  /* The first three stops are the same radius at full opacity: repeating a
+     shadow compounds it, which is what turns a soft glow into an actual
+     outline. That outline is what carries the type where the picture goes
+     dark — the shawl, the shaded foreground — and it is the reason the
+     figures can sit across the whole width instead of being kept to the
+     bright half of the frame. The outer two are the soft lift on the field. */
+  text-shadow:
+    0 0 2px #fff8e8,
+    0 0 2px #fff8e8,
+    0 0 3px #fff8e8,
+    0 0 10px rgb(255 248 232 / 0.95),
+    0 0 24px rgb(255 248 232 / 0.8);
+}
+
+/* The mono goes up a weight on the photograph. At 11px with 0.22em tracking
+   the regular is a hairline, and a halo that thick eats into it — the medium
+   holds its stroke against the outline instead of being absorbed by it. */
+.on-photo .font-mono {
+  font-weight: 500;
+}
+
 /* A section whose ground changes under user control interpolates background
    and text together, so no frame of the transition is light on light. */
 .ground-shift {
@@ -185,8 +234,16 @@
     stroke-dashoffset: 0 !important;
   }
 
-  .frame-crop {
+  .frame-crop,
+  .hero-crop {
     transform: none !important;
+  }
+
+  /* `reducedMotion: "user"` only skips transforms, and the hero's reveal is
+     a clip-path — so it has to be cancelled here, the same way, rather than
+     by rendering a different tree. The photograph arrives whole. */
+  .hero-mask {
+    clip-path: none !important;
   }
 }
 

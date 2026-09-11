@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    /* The hero is a 3200px photograph and is the single heaviest thing the
+       page loads. AVIF first, WebP for the browsers without it. */
+    formats: ["image/avif", "image/webp"],
+  },
 };
 
 export default nextConfig;

@@ -147,6 +147,9 @@ export function StrategicExplorer({ items = interventions, className = "" }: Str
 
   return (
     <div
+      /* The ground here changes with the selection, so the cursor reads it
+         from the live attribute rather than from a fixed section. */
+      data-ground={ground}
       className={`ground-shift [overflow-x:clip] ${className}`}
       style={{ backgroundColor: vars.bg, color: vars.text }}
     >

@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { GROUND } from "@/components/editorial/grounds";
@@ -92,14 +93,26 @@ export function SiteMenu({ open, onClose }: SiteMenuProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: DURATION.small, ease: EASE_EDITORIAL }}
+          data-ground="ink"
           className={`fixed inset-0 z-50 flex flex-col overflow-y-auto ${g.bg} ${g.text}`}
           role="dialog"
           aria-modal="true"
           aria-label="Site navigation"
         >
-          <div className="flex items-center justify-between px-4.5 py-6 md:px-12">
-            <span className="font-display text-xl font-semibold tracking-tight">
-              {organization.shortName}
+          <div className="flex h-20 items-center justify-between px-4.5 md:px-12">
+            <span className="flex items-center gap-5">
+              {/* The same artwork as the bar. Green on white reads on the
+                  charcoal ground as well as it does on the parchment one. */}
+              <Image
+                src="/images/brand/pksf-logo.png"
+                alt={`${organization.shortName} — ${organization.fullName}`}
+                width={320}
+                height={439}
+                className="h-14 w-auto shrink-0"
+              />
+              <span className={`hidden font-mono text-meta uppercase sm:block ${g.muted}`}>
+                Est. {organization.founded} · Bangladesh
+              </span>
             </span>
             <button
               ref={closeRef}
@@ -128,12 +141,12 @@ export function SiteMenu({ open, onClose }: SiteMenuProps) {
                     href={link.href}
                     onClick={onClose}
                     data-cursor="interactive"
-                    className="group flex items-baseline gap-5 py-3 md:gap-8 md:py-4"
+                    className="group flex items-baseline gap-5 py-3.5 md:gap-8 md:py-5"
                   >
                     <span className={`font-mono text-meta uppercase ${g.muted}`}>
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <span className="font-display text-headline font-semibold transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2 motion-reduce:transition-none">
+                    <span className="font-display text-headline font-semibold uppercase tracking-tight transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-3 motion-reduce:transition-none">
                       {link.label}
                     </span>
                   </Link>

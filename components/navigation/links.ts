@@ -16,5 +16,36 @@ export const NAV_LINKS: NavLink[] = [
   { label: "The desk", href: "/#desk" },
 ];
 
+/**
+ * The four words the bar itself carries.
+ *
+ * Not a second navigation — a coarser index into the same page. Four is the
+ * most a bar can hold without competing with the hero, so each one owns a
+ * run of sections rather than pointing at a single anchor, and the readout
+ * below says which run you are in.
+ */
+export const PRIMARY_LINKS: NavLink[] = [
+  { label: "About", href: "/#model" },
+  { label: "Impact", href: "/#ledger" },
+  { label: "Work", href: "/#interventions" },
+  { label: "Knowledge", href: "/#knowledge" },
+];
+
+/**
+ * Which primary word each observed section belongs to. The bar marks the
+ * word rather than the section, so scrolling through seven sections still
+ * reports a position instead of going blank between anchors.
+ */
+export const SECTION_OWNER: Record<string, string> = {
+  themes: "/#model",
+  model: "/#model",
+  ledger: "/#ledger",
+  interventions: "/#interventions",
+  story: "/#interventions",
+  digital: "/#knowledge",
+  desk: "/#knowledge",
+  knowledge: "/#knowledge",
+};
+
 /** Section ids the navbar watches to report where the reader is. */
-export const SECTION_IDS = NAV_LINKS.map((link) => link.href.replace("/#", ""));
+export const SECTION_IDS = Object.keys(SECTION_OWNER);
