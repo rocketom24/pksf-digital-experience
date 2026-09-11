@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 export type NavLink = { label: string; href: string };
 
@@ -13,6 +14,20 @@ type MobileMenuProps = {
 
 /** Full-screen mobile/primary navigation overlay. */
 export function MobileMenu({ open, onClose, links }: MobileMenuProps) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (open) closeRef.current?.focus();
+  }, [open]);
+
+  useEffect(() => {
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    if (open) window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [open, onClose]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -28,6 +43,7 @@ export function MobileMenu({ open, onClose, links }: MobileMenuProps) {
         >
           <div className="flex justify-end px-4.5 py-6 md:px-12">
             <button
+              ref={closeRef}
               type="button"
               onClick={onClose}
               className="text-sm font-medium uppercase tracking-[0.2em] focus-visible:outline-2 focus-visible:outline-green"

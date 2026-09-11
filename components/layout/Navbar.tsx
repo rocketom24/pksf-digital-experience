@@ -35,9 +35,13 @@ export function Navbar() {
   const solid = scrolled || menuOpen || searchOpen;
 
   return (
+    // No backdrop-blur here: a `filter`/`backdrop-filter` on this fixed ancestor would
+    // create a new containing block for the fixed-position MegaMenu/MobileMenu/
+    // SearchOverlay below, trapping them inside this 80px bar instead of the viewport.
+    // `bg-background/95` alone gives a near-solid state without that side effect.
     <header
       className={`fixed inset-x-0 top-0 z-40 transition-colors duration-300 ${
-        solid ? "bg-background/95 text-ink shadow-sm backdrop-blur-sm" : "bg-transparent text-white"
+        solid ? "bg-background/95 text-ink shadow-sm" : "bg-transparent text-white"
       }`}
     >
       <Container className="relative flex h-20 items-center justify-between">
@@ -52,9 +56,24 @@ export function Navbar() {
                 key={link.href}
                 onMouseEnter={() => setWorkOpen(true)}
                 onMouseLeave={() => setWorkOpen(false)}
+                onFocus={() => setWorkOpen(true)}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget as Node)) setWorkOpen(false);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    setWorkOpen(false);
+                    event.currentTarget.querySelector("a")?.focus();
+                  }
+                }}
                 className="relative"
               >
-                <Link href={link.href} className="text-sm font-medium transition-opacity hover:opacity-70">
+                <Link
+                  href={link.href}
+                  aria-haspopup="true"
+                  aria-expanded={workOpen}
+                  className="text-sm font-medium transition-opacity hover:opacity-70"
+                >
                   {link.label}
                 </Link>
                 <MegaMenu open={workOpen} />

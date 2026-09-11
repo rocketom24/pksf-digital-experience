@@ -6,14 +6,16 @@ import { type ReactNode, useRef } from "react";
 type MagneticButtonProps = {
   children: ReactNode;
   className?: string;
-  /** How strongly the button follows the pointer, 0–1. */
+  /** How strongly the button follows the pointer, 0–1. Movement is capped to ~10px regardless. */
   strength?: number;
 } & Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "onDrag" | "onDragStart" | "onDragEnd" | "onAnimationStart" | "onAnimationEnd" | "onAnimationIteration"
 >;
 
-/** Button that subtly follows the cursor within its bounds on hover. */
+const MAX_TRAVEL = 10;
+
+/** Button that subtly follows the cursor within its bounds on hover. Disabled on touch and reduced motion. */
 export function MagneticButton({ children, className = "", strength = 0.35, ...props }: MagneticButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const reduceMotion = useReducedMotion();
@@ -21,10 +23,12 @@ export function MagneticButton({ children, className = "", strength = 0.35, ...p
   const y = useSpring(0, { stiffness: 200, damping: 20, mass: 0.4 });
 
   function handlePointerMove(event: React.PointerEvent<HTMLButtonElement>) {
-    if (reduceMotion || !ref.current) return;
+    if (reduceMotion || !ref.current || event.pointerType !== "mouse") return;
     const bounds = ref.current.getBoundingClientRect();
-    x.set((event.clientX - bounds.left - bounds.width / 2) * strength);
-    y.set((event.clientY - bounds.top - bounds.height / 2) * strength);
+    const dx = (event.clientX - bounds.left - bounds.width / 2) * strength;
+    const dy = (event.clientY - bounds.top - bounds.height / 2) * strength;
+    x.set(Math.max(-MAX_TRAVEL, Math.min(MAX_TRAVEL, dx)));
+    y.set(Math.max(-MAX_TRAVEL, Math.min(MAX_TRAVEL, dy)));
   }
 
   function handlePointerLeave() {
