@@ -40,6 +40,11 @@ export const stories: Story[] = [
     source: "PKSF — RMTP, ‘From Domestic Worker to a Business Owner’",
     url: "https://rmtp.pksf.org.bd/from-domestic-worker-to-a-business-owner/",
     published: "8 March 2025",
+    image: {
+      src: "/images/stories/marjina-khatun.jpg",
+      alt: "Marjina Khatun, smiling, holds a double handful of sun-drying fish scales under a tin-roofed shed, with more scales spread on wooden drying tables around her.",
+      source: "supplied for this project; origin not recorded",
+    },
   },
   {
     slug: "preetilata-tripura",

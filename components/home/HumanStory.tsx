@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Frame } from "@/components/editorial/Frame";
 import { GROUND, type Ground } from "@/components/editorial/grounds";
 import { Meta } from "@/components/editorial/SectionHead";
@@ -36,9 +37,24 @@ export function HumanStory({ ground = "moss", className = "" }: HumanStoryProps)
             ratio="portrait"
             plate="weave"
             treatment="crop"
+            mask
             ground={ground}
-            caption={`Reserved for the photograph published with this account — ${story.source}`}
-          />
+            caption={
+              story.image
+                ? story.source
+                : `Reserved for the photograph published with this account — ${story.source}`
+            }
+          >
+            {story.image && (
+              <Image
+                src={story.image.src}
+                alt={story.image.alt}
+                fill
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                className="object-cover"
+              />
+            )}
+          </Frame>
         </div>
       </div>
 
