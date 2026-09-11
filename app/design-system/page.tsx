@@ -1,351 +1,562 @@
 import type { Metadata } from "next";
+import { Container } from "@/components/layout/Container";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
-import { Container } from "@/components/layout/Container";
-import { Reveal } from "@/components/motion/Reveal";
-import { TextReveal } from "@/components/motion/TextReveal";
-import { ImageReveal } from "@/components/motion/ImageReveal";
-import { Stagger } from "@/components/motion/Stagger";
-import { Parallax } from "@/components/motion/Parallax";
-import { AnimatedNumber } from "@/components/motion/AnimatedNumber";
-import { PageTransition } from "@/components/motion/PageTransition";
-import { Button } from "@/components/ui/Button";
-import { MagneticButton } from "@/components/ui/MagneticButton";
-import { SectionLabel } from "@/components/ui/SectionLabel";
-import { HoverCard } from "@/components/ui/HoverCard";
-import { ImpactNumber } from "@/components/ui/ImpactNumber";
-import { HorizontalScroll } from "@/components/ui/HorizontalScroll";
-import { InteractiveCarousel, type CarouselItem } from "@/components/ui/InteractiveCarousel";
-import { CustomCursor } from "@/components/ui/CustomCursor";
-import { ScrollProgress } from "@/components/ui/ScrollProgress";
-import { EditorialHero } from "@/components/editorial/EditorialHero";
-import { EditorialStatement } from "@/components/editorial/EditorialStatement";
-import { SplitSection } from "@/components/editorial/SplitSection";
-import { FullBleedSection } from "@/components/editorial/FullBleedSection";
-import { MediaTextSection } from "@/components/editorial/MediaTextSection";
-import { EditorialGrid } from "@/components/editorial/EditorialGrid";
-import { StickyStory } from "@/components/editorial/StickyStory";
-import { SectionTransition } from "@/components/editorial/SectionTransition";
+import { DeltaChannels } from "@/components/delta/DeltaChannels";
+import { Frame } from "@/components/editorial/Frame";
+import { Ground } from "@/components/editorial/Ground";
+import { GROUND, type Ground as GroundName } from "@/components/editorial/grounds";
+import { Meta, SectionHead } from "@/components/editorial/SectionHead";
 import { StrategicExplorer } from "@/components/editorial/StrategicExplorer";
-import { organization } from "@/data/organization";
-import { interventions } from "@/data/interventions";
-import { impactMetrics } from "@/data/impact";
-import { PlaygroundSection } from "./PlaygroundSection";
-import { Placeholder } from "./Placeholder";
+import { Plate } from "@/components/home/Plate";
+import { ProvenanceMark, type Provenance } from "@/components/home/ProvenanceMark";
+import { Reveal } from "@/components/motion/Reveal";
+import { Button } from "@/components/ui/Button";
+import { CustomCursor } from "@/components/ui/CustomCursor";
+import { MotionLab } from "@/app/design-system/MotionLab";
 
 export const metadata: Metadata = {
-  title: "Design System",
+  title: "Design system",
   description:
-    "Internal visual and interaction laboratory for the PKSF Digital Experience concept — not a public page.",
-  robots: { index: false, follow: false },
+    "The visual laboratory for the PKSF Digital Experience concept — grounds, type, motion registers, the delta, image treatments and interaction states.",
 };
 
-const carouselItems: CarouselItem[] = interventions.map((item) => ({
-  id: item.slug,
-  label: item.name,
-  content: (
-    <div>
-      <Placeholder label={item.name} tone="green" />
-      <p className="mt-4 font-display text-xl">{item.name}</p>
-    </div>
-  ),
-}));
+const RHYTHM = "py-24 md:py-32";
 
-export default function DesignSystemPage() {
+/** Measured against each ground. See the palette comment in app/globals.css. */
+const GROUNDS: {
+  name: GroundName;
+  hex: string;
+  role: string;
+  text: string;
+  muted: string;
+  accent: string;
+}[] = [
+  {
+    name: "parchment",
+    hex: "#EFE9DA",
+    role: "The light ground. Reading, indexes, the desk.",
+    text: "ink 15.6:1",
+    muted: "5.43:1",
+    accent: "clay 4.81:1",
+  },
+  {
+    name: "paper",
+    hex: "#FAF6EC",
+    role: "Raised paper. Insets and one intervention.",
+    text: "ink 17.5:1",
+    muted: "6.09:1",
+    accent: "clay 5.40:1",
+  },
+  {
+    name: "ink",
+    hex: "#0D1210",
+    role: "Near-black green. Statements, ledger, close.",
+    text: "parchment 15.6:1",
+    muted: "8.03:1",
+    accent: "ember 5.76:1",
+  },
+  {
+    name: "forest",
+    hex: "#14503B",
+    role: "Primary. The delta, the vision.",
+    text: "paper 8.69:1",
+    muted: "4.76:1",
+    accent: "sage 5.29:1",
+  },
+  {
+    name: "moss",
+    hex: "#55632F",
+    role: "Secondary. Land, growth, the human story.",
+    text: "paper 6.06:1",
+    muted: "4.78:1",
+    accent: "mist 4.33:1",
+  },
+];
+
+const SUPPORTING = [
+  { name: "sage", hex: "#B9C7B0", use: "Accent on forest. Small text safe." },
+  { name: "mist", hex: "#D8D2C2", use: "Accent on moss. Large text and UI." },
+  { name: "silt", hex: "#A08F74", use: "Delta channels and hairlines. Never text." },
+  { name: "clay", hex: "#8A5A3B", use: "Accent on light grounds. Small text safe." },
+  { name: "terracotta", hex: "#B45E3C", use: "Large text and UI on light grounds only." },
+  { name: "ember", hex: "#C97A56", use: "Accent on ink. Small text safe." },
+];
+
+const TYPE_SCALE = [
+  { token: "text-colossal", clamp: "4rem → 13rem", use: "Short words holding the viewport." },
+  {
+    token: "text-statement",
+    clamp: "2.6rem → 11.5rem",
+    use: "The same job for a long word — OPPORTUNITY fits a phone on one line.",
+  },
+  { token: "text-display", clamp: "2.5rem → 6.5rem", use: "Section headings, statements." },
+  { token: "text-headline", clamp: "2rem → 3.75rem", use: "Sub-sections, menu items." },
+  { token: "text-title", clamp: "1.5rem → 2.25rem", use: "Names in a list, ledger rows." },
+  { token: "text-lead", clamp: "1.125rem → 1.375rem", use: "Lead prose, in the serif." },
+  { token: "text-body", clamp: "1.0625rem", use: "Body prose." },
+  { token: "text-meta", clamp: "0.6875rem", use: "Mono metadata, uppercase, 0.22em." },
+];
+
+const PROVENANCE: Provenance[] = ["verified", "editorial", "direction", "pending"];
+
+export default function DesignSystem() {
   return (
     <>
-      <ScrollProgress />
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-100 focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:font-display focus:text-sm focus:font-medium focus:text-on-dark"
+      >
+        Skip to content
+      </a>
+
       <CustomCursor />
       <Navbar />
 
-      <PageTransition>
-        <main>
-          <section className="flex min-h-[70vh] flex-col justify-end bg-ink px-4.5 pb-16 pt-32 text-background md:px-12">
-            <SectionLabel theme="dark" className="mb-8">Phase 2 — internal only, not the homepage</SectionLabel>
-            <TextReveal
-              as="h1"
-              text="Design System"
-              className="max-w-4xl font-display text-hero"
+      <main id="main">
+        {/* ── Opening ──────────────────────────────────────────────────── */}
+        <Ground ground="ink">
+          <div className="relative isolate [overflow-x:clip]">
+            <DeltaChannels
+              branching={[3, 2, 2]}
+              spread={1180}
+              seed={11}
+              motionMode="entrance"
+              className={`absolute inset-0 -z-10 h-full w-full ${GROUND.ink.channel}`}
             />
-            <Reveal delay={0.3} className="mt-8 max-w-xl text-lg text-background/70">
-              <p>
-                Every reusable editorial component, motion primitive and interaction pattern for
-                the PKSF Digital Experience concept, in one lab. Phase 3 assembles the homepage
-                from what&rsquo;s demonstrated here.
+            <Container className="flex min-h-[70svh] flex-col justify-end pb-16 pt-32">
+              <Meta ground="ink">Design system</Meta>
+              <h1 className="mt-8 max-w-[14ch] font-display text-display font-bold uppercase">
+                Silt and canopy
+              </h1>
+              <p className={`mt-8 max-w-xl text-lead ${GROUND.ink.muted}`}>
+                The working parts of the PKSF concept: five grounds and the ink
+                levels that are legible on each, three faces with three jobs,
+                three motion registers, and the delta the page is built around.
               </p>
-            </Reveal>
-          </section>
+            </Container>
+          </div>
+        </Ground>
 
-          {/* 01 — Typography */}
-          <PlaygroundSection index="01" title="Typography" description="Display serif for statements, Manrope for everything functional.">
-            <div className="flex flex-col gap-10">
-              <div>
-                <p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted">Hero — text-hero, font-display</p>
-                <p className="font-display text-hero leading-none">Story first.</p>
-              </div>
-              <div>
-                <p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted">Editorial statement — text-editorial, font-display</p>
-                <p className="font-display text-editorial leading-none">A closer look.</p>
-              </div>
-              <div>
-                <p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted">Large statement — text-4xl, font-display</p>
-                <p className="font-display text-4xl">Institutional credibility, told with care.</p>
-              </div>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                  <p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted">Body — text-lg</p>
-                  <p className="max-w-md text-lg text-ink">
-                    {organization.mandate}
-                  </p>
-                </div>
-                <div>
-                  <p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted">Label / metadata</p>
-                  <SectionLabel>Section label</SectionLabel>
-                  <p className="mt-4 text-sm text-muted">Metadata line — text-sm, text-muted</p>
-                </div>
-              </div>
+        {/* ── Grounds ──────────────────────────────────────────────────── */}
+        <Ground ground="parchment" id="ds-colour">
+          <Container className={RHYTHM}>
+            <SectionHead
+              label="01 — Grounds"
+              heading="A ground is a closed set, not a colour."
+              note="Each ground ships with the three ink levels and the one accent that clear WCAG AA on it."
+            />
+
+            <div className="mt-16 grid grid-cols-1 gap-px sm:grid-cols-2 lg:grid-cols-5">
+              {GROUNDS.map((item) => {
+                const g = GROUND[item.name];
+                return (
+                  <Reveal key={item.name} className={`${g.bg} ${g.text} p-6`}>
+                    <p className="font-display text-title font-semibold capitalize">{item.name}</p>
+                    <p className={`mt-1 font-mono text-meta uppercase ${g.muted}`}>{item.hex}</p>
+                    <p className={`mt-5 text-body ${g.muted}`}>{item.role}</p>
+                    <dl className="mt-6 space-y-1 font-mono text-meta uppercase">
+                      <div className="flex justify-between gap-3">
+                        <dt className={g.muted}>Text</dt>
+                        <dd>{item.text}</dd>
+                      </div>
+                      <div className="flex justify-between gap-3">
+                        <dt className={g.muted}>Muted</dt>
+                        <dd className={g.muted}>{item.muted}</dd>
+                      </div>
+                      <div className="flex justify-between gap-3">
+                        <dt className={g.muted}>Accent</dt>
+                        <dd className={g.accent}>{item.accent}</dd>
+                      </div>
+                    </dl>
+                  </Reveal>
+                );
+              })}
             </div>
-          </PlaygroundSection>
 
-          {/* 02 — Color */}
-          <PlaygroundSection index="02" title="Color" description="Green is an accent, not a wash — see docs/art-direction.md.">
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            <h3 className="mt-20">
+              <Meta>Supporting</Meta>
+            </h3>
+            <ul className="mt-6 grid grid-cols-1 gap-x-12 sm:grid-cols-2 lg:grid-cols-3">
+              {SUPPORTING.map((swatch) => (
+                <li
+                  key={swatch.name}
+                  className={`flex items-start gap-4 border-t py-5 ${GROUND.parchment.border}`}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="mt-1 size-8 shrink-0 rounded-full"
+                    style={{ backgroundColor: swatch.hex }}
+                  />
+                  <span>
+                    <span className="block font-display text-base font-semibold capitalize">
+                      {swatch.name}
+                    </span>
+                    <span className="mt-1 block font-mono text-meta uppercase text-muted">
+                      {swatch.hex}
+                    </span>
+                    <span className="mt-2 block text-body text-muted">{swatch.use}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-12 max-w-2xl text-body text-muted">
+              There is no single brand accent. Terracotta clears 3.76:1 on
+              parchment and 4.15:1 on ink but collapses to 2.06:1 on forest, so
+              forest takes sage instead. Picking the accent from the ground,
+              rather than from the brand, is what keeps every pairing legible.
+            </p>
+          </Container>
+        </Ground>
+
+        {/* ── Ground sequence ──────────────────────────────────────────── */}
+        <Ground ground="ink">
+          <Container className={RHYTHM}>
+            <SectionHead
+              label="02 — Sequence"
+              heading="The page alternates rather than tints."
+              ground="ink"
+              note="Nine bands, no two adjacent the same. A section never inherits the register of the one before it."
+            />
+            <ol className="mt-16 flex h-32 w-full overflow-hidden rounded-sm">
+              {(
+                [
+                  "ink",
+                  "forest",
+                  "parchment",
+                  "ink",
+                  "moss",
+                  "ink",
+                  "forest",
+                  "parchment",
+                  "ink",
+                ] as GroundName[]
+              ).map((name, i) => {
+                const g = GROUND[name];
+                return (
+                  <li
+                    key={`${name}-${i}`}
+                    className={`flex flex-1 items-end p-2 ${g.bg} ${g.text}`}
+                  >
+                    <span className="font-mono text-[9px] uppercase tracking-[0.15em] opacity-70">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+            <p className={`mt-6 max-w-2xl text-body ${GROUND.ink.muted}`}>
+              Backgrounds are painted statically, never revealed on scroll. A
+              reveal that carries a section&rsquo;s ground can silently fail to
+              fire when the viewport jumps inside it — an anchor link does
+              exactly that — and the result is unreadable text with no
+              recovery. Transitions are carried by type and by the delta.
+            </p>
+          </Container>
+        </Ground>
+
+        {/* ── Typography ───────────────────────────────────────────────── */}
+        <Ground ground="parchment" id="ds-type">
+          <Container className={RHYTHM}>
+            <SectionHead
+              label="03 — Type"
+              heading="Grotesque display, serif prose, mono data."
+              note="The inversion is the point: this is an institution whose output is documents, so the reading voice is a serif."
+            />
+
+            <div className={`mt-16 grid grid-cols-1 gap-px border-t md:grid-cols-3 ${GROUND.parchment.border}`}>
               {[
-                { name: "Background", cls: "bg-background border border-ink/10", fg: "text-ink" },
-                { name: "Ink", cls: "bg-ink", fg: "text-background" },
-                { name: "Muted", cls: "bg-muted", fg: "text-background" },
-                { name: "White", cls: "bg-white border border-ink/10", fg: "text-ink" },
-                { name: "Green", cls: "bg-green", fg: "text-background" },
-                { name: "Green deep", cls: "bg-green-deep", fg: "text-background" },
-                { name: "Green soft", cls: "bg-green-soft", fg: "text-ink" },
-                { name: "Sand", cls: "bg-sand", fg: "text-ink" },
-                { name: "Clay", cls: "bg-clay", fg: "text-background" },
-                { name: "Sky", cls: "bg-sky", fg: "text-ink" },
-              ].map((swatch) => (
-                <div key={swatch.name} className={`flex aspect-square flex-col justify-end p-4 ${swatch.cls}`}>
-                  <span className={`text-xs font-medium uppercase tracking-[0.15em] ${swatch.fg}`}>{swatch.name}</span>
+                {
+                  face: "Bricolage Grotesque",
+                  cls: "font-display",
+                  job: "Every display line and all interface text. Ink traps and flared joints, so it still has a voice at 13rem.",
+                  sample: "Reach",
+                },
+                {
+                  face: "Newsreader",
+                  cls: "font-prose",
+                  job: "Prose. Optical sizing, set with the leading a serif needs on screen.",
+                  sample: "through",
+                },
+                {
+                  face: "IBM Plex Mono",
+                  cls: "font-mono",
+                  job: "Years, indices, counts, provenance — everything that used to live in a paper ledger.",
+                  sample: "1989",
+                },
+              ].map((item) => (
+                <div key={item.face} className="py-8 md:pr-8">
+                  <p className={`${item.cls} text-[3.5rem] leading-none`}>{item.sample}</p>
+                  <p className="mt-6 font-display text-base font-semibold">{item.face}</p>
+                  <p className="mt-2 max-w-xs text-body text-muted">{item.job}</p>
                 </div>
               ))}
             </div>
-          </PlaygroundSection>
 
-          {/* 03 — Buttons & Links */}
-          <PlaygroundSection index="03" title="Buttons & Links" description="Movement is capped and always keyboard-equivalent — never hover-only.">
-            <div className="flex flex-col gap-10">
-              <div className="flex flex-wrap items-center gap-4">
-                <Button variant="primary" href="#">Primary</Button>
-                <Button variant="secondary" href="#">Secondary</Button>
-                <Button variant="ghost" href="#">Ghost link</Button>
-              </div>
-              <div>
-                <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted">Magnetic button — try with a mouse, then Tab to it</p>
-                <MagneticButton>Explore the interventions</MagneticButton>
-              </div>
+            <dl className="mt-20">
+              {TYPE_SCALE.map((step) => (
+                <div
+                  key={step.token}
+                  className={`grid grid-cols-1 items-baseline gap-2 border-t py-5 md:grid-cols-12 md:gap-8 ${GROUND.parchment.border}`}
+                >
+                  <dt className="font-mono text-meta uppercase md:col-span-3">{step.token}</dt>
+                  <dd className="font-mono text-meta uppercase text-muted md:col-span-3">
+                    {step.clamp}
+                  </dd>
+                  <dd className="text-body text-muted md:col-span-6">{step.use}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <div className={`mt-20 border-t pt-12 ${GROUND.parchment.border}`}>
+              <Meta>In use</Meta>
+              <p className="mt-8 font-display text-colossal font-bold uppercase leading-[0.82]">
+                Delta
+              </p>
+              <p className="mt-6 font-display text-display font-semibold">
+                Three steps between a fund and a household.
+              </p>
+              <p className="mt-6 max-w-xl text-lead text-muted">
+                An apex development organisation that finances and equips a
+                nationwide network of Partner Organisations — and reaches
+                households only through them.
+              </p>
+              <p className="mt-6 font-mono text-meta uppercase text-muted">
+                1990–2005 · 2016 · 2022 · 2023–24 · 2025+
+              </p>
             </div>
-          </PlaygroundSection>
+          </Container>
+        </Ground>
 
-          {/* 04 — Editorial Text */}
-          <PlaygroundSection index="04" title="Editorial Text" description="Line-reveal on viewport entry; screen readers read the real sentence, not split fragments.">
-            <div className="flex flex-col gap-16">
-              <EditorialStatement
-                eyebrow="Statement"
-                text="Modern does not mean excessive."
-                description="EditorialStatement pairs an eyebrow, a TextReveal headline and an optional supporting line."
+        {/* ── The delta ────────────────────────────────────────────────── */}
+        <Ground ground="forest" id="ds-delta" rule>
+          <Container className={RHYTHM}>
+            <SectionHead
+              label="04 — The delta"
+              heading="The signature is a diagram, not an ornament."
+              ground="forest"
+              note="One channel upstream, distributaries that divide, a coastline. It is the shape of apex financing and the geography of the country at once."
+            />
+
+            <div className="mt-16 grid grid-cols-1 gap-10 md:grid-cols-3">
+              {(
+                [
+                  { label: "branching [2, 2, 2]", branching: [2, 2, 2], seed: 1 },
+                  { label: "branching [6, 3]", branching: [6, 3], seed: 4 },
+                  { label: "branching [3, 2, 2]", branching: [3, 2, 2], seed: 11 },
+                ] as const
+              ).map((variant) => (
+                <div key={variant.label}>
+                  <DeltaChannels
+                    branching={[...variant.branching]}
+                    seed={variant.seed}
+                    nodes="junctions"
+                    className={`aspect-square w-full ${GROUND.forest.channel}`}
+                  />
+                  <p className={`mt-4 font-mono text-meta uppercase ${GROUND.forest.muted}`}>
+                    {variant.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <p className={`mt-12 max-w-2xl text-body ${GROUND.forest.muted}`}>
+              Channels are drawn by <code className="font-mono">useScroll</code>,
+              never by an intersection reveal, so a jump in scroll position is
+              just another position. Stroke weight thins downstream because that
+              is what happens to a distributary. The whole layer is decorative
+              and <code className="font-mono">aria-hidden</code>: no text
+              depends on it having run.
+            </p>
+          </Container>
+        </Ground>
+
+        {/* ── Motion ───────────────────────────────────────────────────── */}
+        <Ground ground="parchment" id="ds-motion">
+          <Container className={RHYTHM}>
+            <SectionHead
+              label="05 — Motion"
+              heading="Three registers, and nothing outside them."
+              note="A duration typed inline is a bug. The registers are what make separate sections feel like one system."
+            />
+            <MotionLab className="mt-16" />
+          </Container>
+        </Ground>
+
+        {/* ── Image architecture ───────────────────────────────────────── */}
+        <Ground ground="ink" id="ds-image">
+          <Container className={RHYTHM}>
+            <SectionHead
+              label="06 — Image architecture"
+              heading="Every future photograph already has its frame."
+              ground="ink"
+              note="Plates hold the ratio and treatment a photograph will get, so adding real imagery changes one line and no layouts."
+            />
+
+            <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              <Frame ratio="portrait" plate="weave" ground="ink" caption="portrait · weave" />
+              <Frame ratio="landscape" plate="strata" ground="ink" caption="landscape · strata" />
+              <Frame ratio="square" plate="delta" ground="ink" caption="square · delta" />
+              <Frame
+                ratio="portrait"
+                plate="strata"
+                ground="ink"
+                treatment="fade"
+                caption="portrait · fade, for type over media"
+                overlay={
+                  <p className="font-display text-title font-semibold">Type sits here</p>
+                }
               />
-              <Stagger className="grid grid-cols-1 gap-6 sm:grid-cols-3" itemClassName="border-t border-ink/10 pt-6">
-                {["Motion should communicate hierarchy.", "Whitespace creates a premium feeling.", "Accessibility is part of the design."].map((line) => (
-                  <p key={line} className="text-lg">{line}</p>
-                ))}
-              </Stagger>
             </div>
-          </PlaygroundSection>
 
-          {/* 05 — Media */}
-          <PlaygroundSection index="05" title="Media" description="Clip-path reveals, no layout shift — real imagery arrives in Phase 3.">
-            <div className="flex flex-col gap-16">
+            <p className={`mt-10 max-w-2xl text-body ${GROUND.ink.muted}`}>
+              No stock photography of rural Bangladesh appears anywhere in this
+              concept. Generic imagery would read as real beneficiaries and real
+              projects, which is the one invention that would do actual harm —
+              so the slots are held by drawn plates until there is documented,
+              consented material.
+            </p>
+          </Container>
+        </Ground>
+
+        {/* ── Plates ───────────────────────────────────────────────────── */}
+        <Ground ground="moss">
+          <Container className={RHYTHM}>
+            <SectionHead
+              label="07 — Plates"
+              heading="Three drawings from one landscape."
+              ground="moss"
+              note="Channels, sediment bands, and the weave of the fibre crops grown on them."
+            />
+            <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
+              {(["delta", "strata", "weave"] as const).map((variant) => (
+                <div key={variant}>
+                  <div className={`aspect-4/3 w-full overflow-hidden ${GROUND.moss.channel}`}>
+                    <Plate variant={variant} />
+                  </div>
+                  <p className={`mt-4 font-mono text-meta uppercase ${GROUND.moss.muted}`}>
+                    {variant}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Container>
+        </Ground>
+
+        {/* ── Controls and marks ───────────────────────────────────────── */}
+        <Ground ground="parchment" id="ds-controls">
+          <Container className={RHYTHM}>
+            <SectionHead
+              label="08 — Controls"
+              heading="Two shapes of action, and no third."
+              note="The editorial default is built entirely from currentColor, so it inherits any ground and never needs a per-theme variant."
+            />
+
+            <div className="mt-16 grid grid-cols-1 gap-16 lg:grid-cols-2">
               <div>
-                <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted">ImageReveal — masked reveal + subtle scale, next/image only</p>
-                <div className="max-w-xs bg-ink/5 p-12">
-                  <ImageReveal src="/next.svg" alt="" width={200} height={48} imageClassName="w-full" />
+                <Meta>On parchment</Meta>
+                <div className="mt-8 flex flex-wrap items-center gap-x-12 gap-y-6">
+                  <Button href="#ds-colour">Editorial link</Button>
+                  <Button href="#ds-type" variant="solid" ground="parchment">
+                    Solid
+                  </Button>
                 </div>
               </div>
-              <SplitSection media={<Placeholder label="SplitSection media" tone="sky" />}>
-                <h3 className="font-display text-3xl">SplitSection</h3>
-                <p className="mt-4 max-w-sm text-muted">Media on one side, content on the other. Stacks on mobile, reverses via a prop.</p>
-              </SplitSection>
-              <MediaTextSection
-                media={<Placeholder label="MediaTextSection media" tone="clay" />}
-                eyebrow="Stacked"
-                title="MediaTextSection"
-                description="Full-width media, then a text block — or text first via mediaPosition."
-              />
-              <FullBleedSection
-                media={<div aria-hidden="true" className="h-full w-full bg-sand" />}
-                caption="FullBleedSection: near-full-viewport media with an editorial caption."
-                height="large"
-              />
-              <div>
-                <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted">Parallax — subtle scroll-linked drift, decorative only</p>
-                <div className="flex h-40 items-center justify-center overflow-hidden bg-ink/5">
-                  <Parallax offset={24} className="w-40">
-                    <Placeholder label="Drifts on scroll" tone="clay" className="aspect-square" />
-                  </Parallax>
+              <div className={`${GROUND.forest.bg} ${GROUND.forest.text} p-8`}>
+                <Meta ground="forest">On forest — same components</Meta>
+                <div className="mt-8 flex flex-wrap items-center gap-x-12 gap-y-6">
+                  <Button href="#ds-colour">Editorial link</Button>
+                  <Button href="#ds-type" variant="solid" ground="forest">
+                    Solid
+                  </Button>
                 </div>
               </div>
             </div>
-          </PlaygroundSection>
 
-          {/* 06 — Impact */}
-          <PlaygroundSection index="06" title="Impact" description="Real, verified numbers only — everything else is explicitly labeled as a demo value.">
-            <div className="grid grid-cols-1 gap-12 sm:grid-cols-3">
-              <ImpactNumber value={organization.founded} label="Established" description={`${organization.shortName} was established in ${organization.founded}.`} />
-              <ImpactNumber value={interventions.length} label="Strategic intervention areas" description="The ten published categories, counted from data/interventions.ts." />
-              <ImpactNumber value={128} suffix="+" label="Demo value" description="Illustrative only — not a verified PKSF figure." />
-            </div>
-            <div className="mt-16 flex items-baseline gap-3 border-t border-ink/10 pt-8">
-              <p className="text-xs uppercase tracking-[0.2em] text-muted">Raw AnimatedNumber primitive —</p>
-              <AnimatedNumber value={interventions.length} suffix=" areas" className="font-display text-2xl" />
-            </div>
-            <div className="mt-8 border-t border-ink/10 pt-8">
-              <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted">Verified metrics — pending source</p>
-              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {impactMetrics.map((metric) => (
-                  <li key={metric.slug} className="border-t border-ink/10 pt-4 text-sm text-muted">
-                    {metric.label} — {metric.value === null ? "awaiting verified source" : metric.value}
+            <div className={`mt-20 border-t pt-12 ${GROUND.parchment.border}`}>
+              <Meta>Provenance marks</Meta>
+              <p className="mt-6 max-w-2xl text-body text-muted">
+                Every factual claim on the site carries one of four labels. The
+                mark is shaped as well as coloured, so the states stay
+                distinguishable on any ground and to anyone who does not read
+                the colour.
+              </p>
+              <ul className="mt-8 space-y-4">
+                {PROVENANCE.map((kind) => (
+                  <li key={kind}>
+                    <ProvenanceMark kind={kind} note="what the label is attached to" />
                   </li>
                 ))}
               </ul>
             </div>
-          </PlaygroundSection>
 
-          {/* 07 — Cards */}
-          <PlaygroundSection index="07" title="Cards" description="Title, description and arrow are always visible — hover/focus only adds motion.">
-            <EditorialGrid columns={2}>
-              {interventions.slice(0, 4).map((item, i) => (
-                <HoverCard
-                  key={item.slug}
-                  href={`/work/${item.slug}`}
-                  number={String(i + 1).padStart(2, "0")}
-                  title={item.name}
-                  description={item.description}
-                />
+            <div className={`mt-20 border-t pt-12 ${GROUND.parchment.border}`}>
+              <Meta>Cursor</Meta>
+              <p className="mt-6 max-w-2xl text-body text-muted">
+                The cursor reads <code className="font-mono">data-cursor</code>{" "}
+                off whatever is under the pointer and changes size and label to
+                match. It never renders for a coarse pointer and never under
+                reduced motion. Hover each field below on a mouse to see the
+                state.
+              </p>
+              <div className="mt-8 grid grid-cols-2 gap-px lg:grid-cols-4">
+                {(["interactive", "view", "drag", "explore"] as const).map((state) => (
+                  <div
+                    key={state}
+                    data-cursor={state}
+                    className={`flex h-32 items-end p-4 ${GROUND.paper.bg}`}
+                  >
+                    <span className="font-mono text-meta uppercase text-muted">{state}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Container>
+        </Ground>
+
+        {/* ── Strategic interaction ────────────────────────────────────── */}
+        <Ground ground="parchment" id="ds-strategic">
+          <Container className="pb-12 pt-24 md:pt-32">
+            <SectionHead
+              label="09 — Strategic interaction"
+              heading="The ground changes with the selection."
+              note="Background and text are interpolated together as colour values, so no frame of the transition is light on light."
+            />
+          </Container>
+        </Ground>
+        <StrategicExplorer />
+
+        {/* ── Reduced motion ───────────────────────────────────────────── */}
+        <Ground ground="ink" id="ds-reduced">
+          <Container className={RHYTHM}>
+            <SectionHead
+              label="10 — Reduced motion"
+              heading="The whole story, without the choreography."
+              ground="ink"
+              note="Nothing is removed when motion is off. Sequences become lists, tracks become stacks, and every ground is already painted."
+            />
+            <dl className="mt-16">
+              {[
+                ["Statement sequence", "The sticky track collapses to the three words as a stacked list."],
+                ["Digital timeline", "The horizontal track is replaced by the vertical sequence, in CSS rather than from a hook."],
+                ["Delta channels", "Drawn complete on first paint instead of against scroll."],
+                ["Ground shifts", "Change instantly rather than interpolating."],
+                ["Cursor", "Does not render at all — a spring-followed pointer is exactly what the setting exists to stop."],
+                ["Progress hairline", "Hidden."],
+              ].map(([term, detail]) => (
+                <div
+                  key={term}
+                  className={`grid grid-cols-1 gap-2 border-t py-5 md:grid-cols-12 md:gap-8 ${GROUND.ink.border}`}
+                >
+                  <dt className="font-display text-base font-semibold md:col-span-4">{term}</dt>
+                  <dd className={`text-body md:col-span-8 ${GROUND.ink.muted}`}>{detail}</dd>
+                </div>
               ))}
-            </EditorialGrid>
-          </PlaygroundSection>
-
-          {/* 08 — Storytelling */}
-          <PlaygroundSection index="08" title="Storytelling" description="StickyStory and HorizontalScroll — both driven by native scroll, nothing intercepted.">
-            <div className="flex flex-col gap-24">
-              <StickyStory
-                eyebrow="StickyStory"
-                heading="Anchored on the left, scrolling on the right."
-                description="CSS `position: sticky` holds the heading — no scroll listeners."
-                items={[
-                  { title: "Design system", description: "Motion primitives, editorial components and tokens, defined once." },
-                  { title: "Navigation shell", description: "Transparent-to-solid navbar, mega menu, mobile menu, search overlay." },
-                  { title: "Data architecture", description: "Typed, verified data files — never invented figures." },
-                ]}
-              />
-              <div>
-                <p className="mb-6 text-xs uppercase tracking-[0.2em] text-muted">HorizontalScroll — desktop pins &amp; pans; mobile swipes natively</p>
-                <HorizontalScroll>
-                  {interventions.slice(0, 4).map((item) => (
-                    <div key={item.slug} className="flex h-full flex-col justify-center">
-                      <Placeholder label={item.name} tone="green" className="aspect-video" />
-                      <h4 className="mt-6 font-display text-3xl">{item.name}</h4>
-                      <p className="mt-2 max-w-md text-muted">{item.description}</p>
-                    </div>
-                  ))}
-                </HorizontalScroll>
-              </div>
-            </div>
-          </PlaygroundSection>
-
-          {/* 09 — Strategic Explorer */}
-          <PlaygroundSection index="09" title="Strategic Explorer" description="The real ten intervention areas — select with click, tap, or Tab + Enter/Space.">
-            <StrategicExplorer />
-          </PlaygroundSection>
-
-          {/* 10 — Carousel */}
-          <PlaygroundSection index="10" title="Carousel" description="One scroll-snap track underneath drag, swipe, buttons and arrow keys.">
-            <InteractiveCarousel items={carouselItems} ariaLabel="Strategic intervention areas carousel" />
-          </PlaygroundSection>
-
-          {/* 11 — Navigation */}
-          <PlaygroundSection index="11" title="Navigation" description="The header above is built from exactly these components — transparent on load, solid once scrolled.">
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-              <div className="border border-ink/10 p-6">
-                <h4 className="font-display text-xl">Navbar</h4>
-                <p className="mt-2 text-sm text-muted">Transparent over the hero, solid once `scrollY &gt; 32`. Try scrolling this page.</p>
-              </div>
-              <div className="border border-ink/10 p-6">
-                <h4 className="font-display text-xl">Mega menu</h4>
-                <p className="mt-2 text-sm text-muted">Hover or focus &ldquo;Our Work&rdquo; above — staggered reveal, Escape to close. Positioned `fixed` to the header, so it isn&rsquo;t previewable boxed-in here.</p>
-              </div>
-              <div className="border border-ink/10 p-6">
-                <h4 className="font-display text-xl">Mobile menu &amp; search</h4>
-                <p className="mt-2 text-sm text-muted">&ldquo;Menu&rdquo; and &ldquo;Search&rdquo; above open full-screen overlays — both focus-manage and close on Escape.</p>
-              </div>
-            </div>
-          </PlaygroundSection>
-
-          {/* 12 — Themes */}
-          <div className="flex flex-col">
-            <SectionTransition theme="green">
-              <Container className="py-20 md:py-28">
-                <SectionLabel theme="green" className="mb-6">12 — Themes · Green</SectionLabel>
-                <h2 className="font-display text-4xl md:text-5xl">Impact</h2>
-                <p className="mt-4 max-w-md text-background/70">SectionTransition paints a themed panel and draws a hairline across its top edge as it enters — background only, content never shifts.</p>
-              </Container>
-            </SectionTransition>
-            <SectionTransition theme="dark">
-              <Container className="py-20 md:py-28">
-                <SectionLabel theme="dark" className="mb-6">Dark</SectionLabel>
-                <h2 className="font-display text-4xl md:text-5xl">Information</h2>
-              </Container>
-            </SectionTransition>
-            <SectionTransition theme="light">
-              <Container className="py-20 md:py-28">
-                <SectionLabel className="mb-6">Light</SectionLabel>
-                <h2 className="font-display text-4xl md:text-5xl">Quiet</h2>
-              </Container>
-            </SectionTransition>
-          </div>
-
-          {/* 13 — Accessibility & Reduced Motion */}
-          <PlaygroundSection index="13" title="Accessibility & Reduced Motion" description="Every motion primitive checks useReducedMotion() and substitutes an instant, fully accessible state.">
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-              <ul className="flex flex-col gap-3 text-sm text-muted">
-                <li>— Reveals settle instantly with reduced motion, no opacity/position left mid-transition.</li>
-                <li>— TextReveal always renders the full real sentence in the DOM; only the visual mask animates.</li>
-                <li>— MagneticButton ignores touch pointers and reduced motion — keyboard activation is unaffected either way.</li>
-                <li>— CustomCursor never mounts on coarse pointers and never intercepts clicks (pointer-events: none).</li>
-                <li>— HorizontalScroll and InteractiveCarousel are native-scroll-driven, so Page Down / swipe / trackpad all just work.</li>
-                <li>— Overlays (mobile menu, search) move focus in on open, close on Escape, and never trap Tab.</li>
-              </ul>
-              <div className="border border-ink/10 p-6">
-                <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted">Try it</p>
-                <p className="text-sm text-muted">
-                  Enable &ldquo;Reduce motion&rdquo; in your OS accessibility settings and reload — every reveal, the
-                  mega menu stagger, the carousel and the section themes above simplify or disable their motion
-                  automatically.
-                </p>
-              </div>
-            </div>
-          </PlaygroundSection>
-
-          <div id="editorial-hero-demo">
-            <EditorialHero
-              eyebrow="EditorialHero — demo"
-              title="Everything responds. Nothing screams."
-              description="The last reusable primitive: a full-height hero with eyebrow, headline, description and optional CTAs."
-              theme="dark"
-            >
-              <Button variant="primary" href="#">Back to top</Button>
-            </EditorialHero>
-          </div>
-        </main>
-      </PageTransition>
+            </dl>
+          </Container>
+        </Ground>
+      </main>
 
       <Footer />
     </>

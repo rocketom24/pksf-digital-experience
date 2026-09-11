@@ -1,19 +1,25 @@
+import { GROUND, type Ground } from "@/components/editorial/grounds";
+
 type ScrollCueProps = {
   /** In-page target, so the cue is a working control and not decoration. */
   href: string;
   label?: string;
+  ground?: Ground;
   className?: string;
 };
 
-/** Hero scroll affordance: a travelling hairline plus a real skip-to-section link. */
-export function ScrollCue({ href, label = "Scroll", className = "" }: ScrollCueProps) {
+/** A travelling hairline plus a real skip-to-section link — an affordance, not an ornament. */
+export function ScrollCue({ href, label = "Scroll", ground = "ink", className = "" }: ScrollCueProps) {
+  const g = GROUND[ground];
+
   return (
     <a
       href={href}
-      className={`inline-flex items-center gap-4 text-xs font-medium uppercase tracking-[0.2em] text-background/70 transition-colors hover:text-background focus-visible:outline-2 focus-visible:outline-current ${className}`}
+      data-cursor="interactive"
+      className={`inline-flex items-center gap-4 font-mono text-meta uppercase transition-opacity duration-200 hover:opacity-100 ${g.muted} ${className}`}
     >
-      <span aria-hidden="true" className="relative block h-10 w-px overflow-hidden bg-background/25">
-        <span className="absolute inset-x-0 top-0 block h-full animate-cue bg-background motion-reduce:animate-none" />
+      <span aria-hidden="true" className={`relative block h-12 w-px overflow-hidden ${g.rule}`}>
+        <span className="absolute inset-x-0 top-0 block h-full animate-cue bg-current opacity-90 motion-reduce:animate-none" />
       </span>
       {label}
     </a>

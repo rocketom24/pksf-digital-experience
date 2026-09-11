@@ -1,44 +1,135 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────────────
+   PKSF — "Silt and canopy"
+
+   The palette is taken from the Ganges–Brahmaputra delta rather than from
+   institutional-green convention: canopy greens, river silt, fired clay,
+   and the warm paper of a field ledger. Every value below was checked for
+   contrast against the grounds it is allowed to sit on; the permitted
+   pairings are recorded next to each token and enforced by
+   components/editorial/ground.ts.
+   ───────────────────────────────────────────────────────────────────── */
+
 :root {
-  --background: #f5f4ef;
-  --ink: #111312;
-  /* Darkened from #6F756F so 14px body text clears 4.5:1 on --background. */
-  --muted: #6a706a;
-  --green: #1f6b4f;
-  --green-deep: #123f31;
-  --green-soft: #dce9e1;
-  --sand: #d9c8a4;
-  --clay: #9b7653;
-  --sky: #b7ccd0;
+  /* Grounds */
+  --paper: #faf6ec; /* raised paper — insets on parchment */
+  --parchment: #efe9da; /* the light ground */
+  --ink: #0d1210; /* near-black green */
+  --forest: #14503b; /* primary */
+  --moss: #55632f; /* secondary */
+
+  /* Ink levels, one per ground. All ≥ 4.5:1 on their own ground. */
+  --on-light: #0d1210; /* 15.6 on parchment */
+  --on-light-muted: #5a5f52; /* 5.43 on parchment, 6.09 on paper */
+  --on-dark: #efe9da; /* 15.6 on ink */
+  --on-dark-muted: #ada99b; /* 8.03 on ink */
+  --on-forest: #faf6ec; /* 8.69 on forest */
+  --on-forest-muted: #a8bfa6; /* 4.76 on forest */
+  --on-moss: #faf6ec; /* 6.06 on moss */
+  --on-moss-muted: #e2dccc; /* 4.78 on moss */
+
+  /* Supporting + accent. Each accent is ground-specific: a single fixed
+     accent cannot clear 3:1 on parchment, ink and forest at once. */
+  --sage: #b9c7b0; /* soft sage — accent on forest (5.29) */
+  --clay: #8a5a3b; /* warm brown — small-text accent on light (4.81) */
+  --terracotta: #b45e3c; /* muted terracotta — large text / UI on light (3.76) */
+  --ember: #c97a56; /* lifted terracotta — accent on ink (5.76) */
+  --silt: #a08f74; /* channel lines, hairlines — never text */
+  --mist: #d8d2c2; /* accent on moss (4.33 large) */
+
+  /* Hairline rules. Separated from text colours so a rule never gets
+     mistaken for a legible ink. */
+  --rule-light: rgb(13 18 16 / 0.14);
+  --rule-dark: rgb(239 233 218 / 0.18);
+
+  /* Declared here rather than in `@theme inline`, which resolves its values
+     into utilities and never emits the custom property — plain CSS below
+     needs to be able to read it. Mirrors EASE_EDITORIAL in
+     components/motion/tokens.ts. */
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @theme inline {
-  --color-background: var(--background);
+  /* Grounds */
+  --color-paper: var(--paper);
+  --color-parchment: var(--parchment);
+  --color-background: var(--parchment);
   --color-ink: var(--ink);
-  --color-muted: var(--muted);
-  --color-green: var(--green);
-  --color-green-deep: var(--green-deep);
-  --color-green-soft: var(--green-soft);
-  --color-sand: var(--sand);
+  --color-forest: var(--forest);
+  --color-moss: var(--moss);
+
+  /* Ink levels */
+  --color-on-light: var(--on-light);
+  --color-muted: var(--on-light-muted);
+  --color-on-dark: var(--on-dark);
+  --color-on-dark-muted: var(--on-dark-muted);
+  --color-on-forest: var(--on-forest);
+  --color-on-forest-muted: var(--on-forest-muted);
+  --color-on-moss: var(--on-moss);
+  --color-on-moss-muted: var(--on-moss-muted);
+
+  /* Supporting */
+  --color-sage: var(--sage);
   --color-clay: var(--clay);
-  --color-sky: var(--sky);
+  --color-terracotta: var(--terracotta);
+  --color-ember: var(--ember);
+  --color-silt: var(--silt);
+  --color-mist: var(--mist);
 
-  --font-display: var(--font-instrument-serif);
-  --font-sans: var(--font-manrope);
+  /* ── Type ──────────────────────────────────────────────────────────────
+     Grotesque display / serif prose / mono data. The inversion is
+     deliberate: a development institution publishes documents, so the
+     reading voice is a serif, and the mono carries everything that used to
+     live in a paper ledger — years, indices, counts, provenance. */
+  --font-display: var(--font-bricolage);
+  --font-prose: var(--font-newsreader);
+  --font-mono: var(--font-plex-mono);
+  --font-sans: var(--font-bricolage);
 
-  /* Editorial type scale — see docs/art-direction.md */
-  --text-hero: clamp(4rem, 9vw, 9rem);
-  --text-hero--line-height: 0.95;
-  --text-hero--letter-spacing: -0.02em;
+  /* Statement type. One word can hold the viewport at `colossal`.
+     `colossal` is sized for short words — Reach, Others, PKSF. `statement`
+     is a notch smaller at the narrow end so an eleven-letter word such as
+     OPPORTUNITY still fits a phone on one line; at `colossal` it overruns
+     the measure and the section clips the last letters off. */
+  --text-colossal: clamp(4rem, 13vw, 13rem);
+  --text-colossal--line-height: 0.82;
+  --text-colossal--letter-spacing: -0.045em;
 
-  --text-editorial: clamp(3rem, 7vw, 7rem);
-  --text-editorial--line-height: 1;
-  --text-editorial--letter-spacing: -0.015em;
-}
+  --text-statement: clamp(2.6rem, 11.5vw, 11.5rem);
+  --text-statement--line-height: 0.86;
+  --text-statement--letter-spacing: -0.04em;
 
-@theme {
-  --animate-cue: cue-travel 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  /* 0.94 rather than 0.90: at 0.90 a descender on one line of a two-line
+     heading touches the ascender below it. */
+  --text-display: clamp(2.5rem, 7.5vw, 6.5rem);
+  --text-display--line-height: 0.94;
+  --text-display--letter-spacing: -0.035em;
+
+  --text-headline: clamp(2rem, 4.4vw, 3.75rem);
+  --text-headline--line-height: 0.98;
+  --text-headline--letter-spacing: -0.028em;
+
+  --text-title: clamp(1.5rem, 2.6vw, 2.25rem);
+  --text-title--line-height: 1.06;
+  --text-title--letter-spacing: -0.02em;
+
+  /* Prose is set in the serif, so it needs more leading than the grotesque. */
+  --text-lead: clamp(1.125rem, 1.25vw, 1.375rem);
+  --text-lead--line-height: 1.55;
+  --text-lead--letter-spacing: 0;
+
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.6;
+
+  --text-meta: 0.6875rem;
+  --text-meta--line-height: 1.45;
+  --text-meta--letter-spacing: 0.22em;
+
+  /* ── Motion ───────────────────────────────────────────────────────────
+     Mirrors components/motion/tokens.ts so CSS-only motion and JS motion
+     agree. Small 200–400ms, editorial 500–900ms, cinematic 900–1600ms. */
+  --animate-cue: cue-travel 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 /* Hero scroll cue: a hairline that wipes down, then clears from the top. */
@@ -61,6 +152,35 @@
   }
 }
 
+/* A section whose ground changes under user control interpolates background
+   and text together, so no frame of the transition is light on light. */
+.ground-shift {
+  transition:
+    background-color 700ms var(--ease-editorial),
+    color 700ms var(--ease-editorial),
+    border-color 700ms var(--ease-editorial);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ground-shift {
+    transition: none;
+  }
+
+  /* Two scroll-linked effects are driven by a MotionValue written straight
+     into the inline style, so they cannot be switched off by rendering
+     something different — that is the hydration mismatch this file exists to
+     avoid. Overriding the inline value here is the one place `!important` is
+     the correct tool: the channels paint complete and the crop sits still. */
+  .delta-channel {
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+
+  .frame-crop {
+    transform: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
@@ -68,25 +188,53 @@
 }
 
 html {
-  background: var(--color-background);
+  background: var(--parchment);
+  /* The display face is set tight; without this the browser's default
+     kerning-off behaviour at large sizes opens the counters back up. */
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--color-background);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
+  background: var(--parchment);
+  color: var(--on-light);
+  font-family: var(--font-prose);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  /* Nothing on this page may cause a horizontal scrollbar. Oversized
+     display type is clipped by its own section, not by the document. */
+  overflow-x: clip;
+}
+
+/* Utility and interface text is the grotesque; only prose is the serif. */
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-display);
 }
 
 ::selection {
-  background: var(--color-green);
-  color: var(--color-background);
+  background: var(--forest);
+  color: var(--paper);
 }
 
-/* `currentColor`, not the brand green: green clears 3:1 on the cream ground
-   but only reaches 2.9:1 on --ink and 1.8:1 on --green-deep, so a fixed
-   accent leaves the focus ring failing on every dark section. Taking the
-   element's own text colour guarantees a visible ring on any theme. */
+/* `currentColor`, not a fixed accent: the page runs across five grounds and
+   no single ring colour clears 3:1 on all of them. Taking the element's own
+   text colour guarantees a visible ring wherever the control lands. */
 :focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* The custom cursor replaces the system one only where it is actually
+   drawn — never on touch, never under reduced motion. */
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html.has-custom-cursor,
+  html.has-custom-cursor a,
+  html.has-custom-cursor button,
+  html.has-custom-cursor [role="tab"] {
+    cursor: none;
+  }
 }

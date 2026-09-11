@@ -1,35 +1,43 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { type ReactNode } from "react";
+import { DURATION, EASE_EDITORIAL, VIEWPORT_ONCE } from "@/components/motion/tokens";
 
 type RevealProps = {
   children: ReactNode;
   className?: string;
-  /** Vertical travel distance in px before settling. */
+  /** Vertical travel before settling, in px. */
   distance?: number;
-  /** Reveal duration in seconds — see docs/art-direction.md "Motion". */
+  /** Defaults to the editorial register. */
   duration?: number;
   delay?: number;
 };
 
-/** Viewport-triggered fade + rise reveal for editorial content blocks. */
+/**
+ * Viewport-triggered fade and rise, for editorial blocks.
+ *
+ * Only for content **smaller than the viewport**. An intersection reveal on a
+ * taller element never fires when the scroll position jumps from "below it"
+ * to "inside it" — which is what an anchor link does — and with `once: true`
+ * it never recovers, leaving the content invisible for the rest of the
+ * session. Anything full-height uses `useScroll` instead, and anything
+ * carrying a background is painted statically.
+ */
 export function Reveal({
   children,
   className,
-  distance = 24,
-  duration = 0.7,
+  distance = 22,
+  duration = DURATION.editorial,
   delay = 0,
 }: RevealProps) {
-  const reduceMotion = useReducedMotion();
-
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: reduceMotion ? 0 : distance }}
+      initial={{ opacity: 0, y: distance }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10% 0px" }}
-      transition={{ duration: reduceMotion ? 0 : duration, delay, ease: [0.16, 1, 0.3, 1] }}
+      viewport={VIEWPORT_ONCE}
+      transition={{ duration, delay, ease: EASE_EDITORIAL }}
     >
       {children}
     </motion.div>

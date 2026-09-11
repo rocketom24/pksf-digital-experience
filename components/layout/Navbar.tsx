@@ -2,114 +2,95 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Container } from "@/components/layout/Container";
-import { MegaMenu } from "@/components/navigation/MegaMenu";
-import { MobileMenu, type NavLink } from "@/components/navigation/MobileMenu";
-import { SearchOverlay } from "@/components/navigation/SearchOverlay";
+import { NAV_LINKS, SECTION_IDS } from "@/components/navigation/links";
+import { SiteMenu } from "@/components/navigation/SiteMenu";
 import { organization } from "@/data/organization";
 
-// Every entry points at a section that exists. Dedicated routes (/about,
-// /work/<slug>, …) are not built yet, and linking to them 404s and fills the
-// console with failed prefetches — so the nav addresses the homepage instead
-// until those pages are real.
-const links: NavLink[] = [
-  { label: "About", href: "/#statement" },
-  { label: "Our Work", href: "/#interventions" },
-  { label: "Impact", href: "/#impact" },
-  { label: "Knowledge", href: "/#knowledge" },
-  { label: "Digital", href: "/#digital" },
-  { label: "News", href: "/#news" },
-];
-
+/**
+ * The bar carries three things: who this is, where you are, and the way in.
+ *
+ * There is no row of links. A page this long needs wayfinding more than it
+ * needs a persistent menu, so the middle slot reports the section you are
+ * currently reading and everything else lives in the overlay. The readout is
+ * supplementary — the same sections are reachable from the overlay and from
+ * the page itself — so nothing breaks if the observer is unsupported.
+ */
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [workOpen, setWorkOpen] = useState(false);
+  const [current, setCurrent] = useState<string | null>(null);
 
   useEffect(() => {
-    function handleScroll() {
-      setScrolled(window.scrollY > 32);
-    }
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const solid = scrolled || menuOpen || searchOpen;
+  useEffect(() => {
+    const sections = SECTION_IDS.map((id) => document.getElementById(id)).filter(
+      (el): el is HTMLElement => el !== null
+    );
+    if (!sections.length) return;
+
+    // A band across the upper third of the viewport: whatever sits in it is
+    // what the reader is looking at. Keyed on the top of each section so a
+    // section taller than the screen still reports correctly.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length) setCurrent(visible[0].target.id);
+      },
+      { rootMargin: "-12% 0px -70% 0px", threshold: 0 }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
+  const label = NAV_LINKS.find((link) => link.href === `/#${current}`)?.label;
 
   return (
-    // No backdrop-blur here: a `filter`/`backdrop-filter` on this fixed ancestor would
-    // create a new containing block for the fixed-position MegaMenu/MobileMenu/
-    // SearchOverlay below, trapping them inside this 80px bar instead of the viewport.
-    // `bg-background/95` alone gives a near-solid state without that side effect.
     <header
-      className={`fixed inset-x-0 top-0 z-40 transition-colors duration-300 ${
-        solid ? "bg-background/95 text-ink shadow-sm" : "bg-transparent text-white"
+      // No `backdrop-filter`: a filter on this fixed ancestor would create a
+      // containing block for the fixed overlay below, trapping it inside the
+      // bar instead of the viewport.
+      className={`fixed inset-x-0 top-0 z-40 transition-colors duration-300 motion-reduce:transition-none ${
+        scrolled || menuOpen
+          ? "border-b border-on-light/12 bg-parchment/95 text-on-light"
+          : "border-b border-transparent bg-transparent text-on-dark"
       }`}
     >
-      <Container className="relative flex h-20 items-center justify-between">
-        <Link href="/" className="font-display text-2xl tracking-tight">
+      <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between px-4.5 md:px-12">
+        <Link
+          href="/"
+          data-cursor="interactive"
+          className="font-display text-xl font-semibold tracking-tight"
+        >
           {organization.shortName}
         </Link>
 
-        <nav aria-label="Primary" className="hidden items-center gap-8 lg:flex">
-          {links.map((link) =>
-            link.label === "Our Work" ? (
-              <div
-                key={link.href}
-                onMouseEnter={() => setWorkOpen(true)}
-                onMouseLeave={() => setWorkOpen(false)}
-                onFocus={() => setWorkOpen(true)}
-                onBlur={(event) => {
-                  if (!event.currentTarget.contains(event.relatedTarget as Node)) setWorkOpen(false);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    setWorkOpen(false);
-                    event.currentTarget.querySelector("a")?.focus();
-                  }
-                }}
-                className="relative"
-              >
-                <Link
-                  href={link.href}
-                  aria-haspopup="true"
-                  aria-expanded={workOpen}
-                  className="text-sm font-medium transition-opacity hover:opacity-70"
-                >
-                  {link.label}
-                </Link>
-                <MegaMenu open={workOpen} />
-              </div>
-            ) : (
-              <Link key={link.href} href={link.href} className="text-sm font-medium transition-opacity hover:opacity-70">
-                {link.label}
-              </Link>
-            )
-          )}
-        </nav>
-
         <div className="flex items-center gap-6">
-          <button
-            type="button"
-            onClick={() => setSearchOpen(true)}
-            className="text-sm font-medium uppercase tracking-[0.2em] transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-current"
-          >
-            Search
-          </button>
+          {/* `aria-live` is off: this narrates scrolling, which a screen
+              reader user is already tracking through the headings. */}
+          <span className="hidden font-mono text-meta uppercase opacity-60 sm:block">
+            {label ?? "Independent concept"}
+          </span>
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
-            className="text-sm font-medium uppercase tracking-[0.2em] transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-current"
+            data-cursor="interactive"
+            aria-expanded={menuOpen}
+            className="font-mono text-meta uppercase transition-opacity duration-200 hover:opacity-60 motion-reduce:transition-none"
           >
             Menu
           </button>
         </div>
-      </Container>
+      </div>
 
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} links={links} />
-      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SiteMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
     </header>
   );
 }
