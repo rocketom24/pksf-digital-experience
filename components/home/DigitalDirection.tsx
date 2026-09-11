@@ -2,7 +2,7 @@ import { GROUND, type Ground } from "@/components/editorial/grounds";
 import { Meta } from "@/components/editorial/SectionHead";
 import { ProvenanceMark } from "@/components/home/ProvenanceMark";
 import { Reveal } from "@/components/motion/Reveal";
-import { digitalDirection } from "@/data/digital";
+import { digitalDirection, digitalHorizon, digitalMetrics } from "@/data/digital";
 
 /**
  * `digitalDirection` is ordered capabilities-first, then the three-stage end
@@ -25,8 +25,9 @@ type DigitalDirectionProps = { ground?: Ground; className?: string };
  * means, set small in the mono, so the hierarchy says which is the claim and
  * which is the detail.
  *
- * Every string here is published direction, not a delivered milestone, and
- * the provenance mark says so.
+ * The two figures at the foot are delivered and are marked as verified. The
+ * three stages are published direction for 2030 — PKSF has not said the
+ * cashless, AI-driven end state exists today, and neither does this page.
  */
 export function DigitalDirection({ ground = "ink", className = "" }: DigitalDirectionProps) {
   const g = GROUND[ground];
@@ -34,6 +35,14 @@ export function DigitalDirection({ ground = "ink", className = "" }: DigitalDire
   return (
     <div className={className}>
       <Meta ground={ground}>Vision — where it is heading</Meta>
+
+      <Reveal className="mt-8">
+        <p className={`max-w-2xl text-lead ${g.muted}`}>
+          &ldquo;{digitalHorizon.statement}&rdquo; — by {digitalHorizon.year}. Three
+          stages, in an order that is not interchangeable: nothing goes cashless
+          before it goes paperless, and nothing is data-intelligent before either.
+        </p>
+      </Reveal>
 
       <ol className="mt-12 md:mt-16">
         {visionStages.map((stage, i) => (
@@ -68,9 +77,36 @@ export function DigitalDirection({ ground = "ink", className = "" }: DigitalDire
       <ProvenanceMark
         kind="direction"
         ground={ground}
-        note="stated direction, not a delivered milestone"
+        note={`${digitalHorizon.source} — stated direction, not a delivered milestone`}
         className="mt-12"
       />
+
+      {/* What has actually been delivered, separated from the direction above
+          by a rule so the two are never read as one claim. */}
+      <Reveal delay={0.12} className={`mt-16 border-t pt-10 ${g.border}`}>
+        <Meta ground={ground}>Delivered so far</Meta>
+        <dl className="mt-8 grid gap-10 sm:grid-cols-2">
+          {digitalMetrics.map((metric) => (
+            <div key={metric.label}>
+              <dt className="font-mono text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-[-0.03em]">
+                {metric.value}
+              </dt>
+              <dd className="mt-4">
+                <span className="block font-display text-title font-semibold text-balance">
+                  {metric.label}
+                </span>
+                <span className={`mt-2 block max-w-xs text-body ${g.muted}`}>{metric.note}</span>
+                <ProvenanceMark
+                  kind="verified"
+                  ground={ground}
+                  note={`PKSF — Digital Transformation, ${metric.asOf}`}
+                  className="mt-4"
+                />
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </Reveal>
     </div>
   );
 }

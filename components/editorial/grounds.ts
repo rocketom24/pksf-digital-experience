@@ -2,18 +2,18 @@
  * The five grounds the page moves through.
  *
  * Every entry is a closed set: a background, the three ink levels that clear
- * WCAG AA on it, the one accent that clears 3:1 on it, and a hairline. The
- * accent differs per ground on purpose — terracotta reads on parchment and
- * on ink but collapses to 2.06:1 on forest, so forest takes sage instead.
+ * WCAG AA on it, the one accent that clears 4.5:1 on it, and a hairline. The
+ * accent differs per ground on purpose — terracotta reads on cream and the
+ * gold reads on PKSF green, and neither works on the other.
  * Components pick a ground and use its tokens; they never reach for a raw
  * colour, which is what kept unreadable pairings out of Phase 3.
  *
  * Ratios (measured, see the palette comment in app/globals.css):
- *   parchment  ink 15.6 · muted 5.43 · terracotta 3.76 (large/UI only)
- *   paper      ink 17.5 · muted 6.09 · clay 5.40
- *   ink        parchment 15.6 · muted 8.03 · ember 5.76
- *   forest     paper 8.69 · muted 4.76 · sage 5.29
- *   moss       paper 6.06 · muted 4.78 · mist 4.33
+ *   parchment  ink 10.88 · muted 6.34 · clay 5.57 · terracotta 3.25 (large/UI)
+ *   paper      ink 11.90 · muted 6.93 · clay 6.09
+ *   ink        paper 15.51 · muted 8.26 · ember 7.33
+ *   forest     paper 6.26 · muted 4.59 · gold 4.70
+ *   moss       paper 5.56 · muted 4.54 · mist 4.91
  */
 export type Ground = "parchment" | "paper" | "ink" | "forest" | "moss";
 
@@ -67,7 +67,7 @@ export const GROUND_VARS: Record<Ground, Record<"bg" | "text" | "muted" | "accen
     bg: "var(--forest)",
     text: "var(--on-forest)",
     muted: "var(--on-forest-muted)",
-    accent: "var(--sage)",
+    accent: "var(--gold)",
   },
   moss: {
     bg: "var(--moss)",
@@ -115,11 +115,11 @@ export const GROUND: Record<Ground, GroundTokens> = {
     bg: "bg-forest",
     text: "text-on-forest",
     muted: "text-on-forest-muted",
-    accent: "text-sage",
+    accent: "text-gold",
     rule: "bg-on-forest/20",
     border: "border-on-forest/20",
-    channel: "text-sage/45",
-    plate: "text-sage/90",
+    channel: "text-gold/45",
+    plate: "text-gold/90",
     dark: true,
   },
   moss: {

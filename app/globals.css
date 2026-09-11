@@ -1,47 +1,56 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────────────────────
-   PKSF — "Silt and canopy"
+   PKSF — "Delta, canopy and sunlight"
 
-   The palette is taken from the Ganges–Brahmaputra delta rather than from
-   institutional-green convention: canopy greens, river silt, fired clay,
-   and the warm paper of a field ledger. Every value below was checked for
-   contrast against the grounds it is allowed to sit on; the permitted
-   pairings are recorded next to each token and enforced by
-   components/editorial/ground.ts.
+   The palette is Bangladesh rather than institutional-European: PKSF green
+   as the primary ground, the leaf green of cultivated land as the secondary,
+   fired terracotta and the golden mustard of a ripe field as the two
+   accents, and the warm paper of a field ledger as the light ground.
+
+   Every value below was measured against the grounds it is allowed to sit
+   on — not eyeballed — and the ratio is recorded next to the token. The
+   permitted pairings are enforced by components/editorial/grounds.ts.
+
+   Source hues: DEEP FOREST #073B2A · PKSF GREEN #006A4E · LEAF/BOTANICAL
+   GREEN #62A83B (darkened to #3F7030 so warm paper clears AA on it) ·
+   WARM PAPER #FFF8E8 · SOFT CREAM #F5EEDC · TERRACOTTA #D95D39 · GOLDEN
+   MUSTARD #D6A63A · CHARCOAL #10231C · PALE MINT #DDEFE5.
    ───────────────────────────────────────────────────────────────────── */
 
 :root {
   /* Grounds */
-  --paper: #faf6ec; /* raised paper — insets on parchment */
-  --parchment: #efe9da; /* the light ground */
-  --ink: #0d1210; /* near-black green */
-  --forest: #14503b; /* primary */
-  --moss: #55632f; /* secondary */
+  --paper: #fff8e8; /* warm paper — raised insets on parchment */
+  --parchment: #f5eedc; /* soft cream — the light ground */
+  --ink: #10231c; /* charcoal — near-black green */
+  --forest: #006a4e; /* PKSF green — primary */
+  --moss: #3f7030; /* leaf green — secondary */
 
   /* Ink levels, one per ground. All ≥ 4.5:1 on their own ground. */
-  --on-light: #0d1210; /* 15.6 on parchment */
-  --on-light-muted: #5a5f52; /* 5.43 on parchment, 6.09 on paper */
-  --on-dark: #efe9da; /* 15.6 on ink */
-  --on-dark-muted: #ada99b; /* 8.03 on ink */
-  --on-forest: #faf6ec; /* 8.69 on forest */
-  --on-forest-muted: #a8bfa6; /* 4.76 on forest */
-  --on-moss: #faf6ec; /* 6.06 on moss */
-  --on-moss-muted: #e2dccc; /* 4.78 on moss */
+  --on-light: #073b2a; /* deep forest — 10.88 on parchment, 11.90 on paper */
+  --on-light-muted: #4a5a4e; /* 6.34 on parchment, 6.93 on paper */
+  --on-dark: #fff8e8; /* 15.51 on ink */
+  --on-dark-muted: #a9bdad; /* 8.26 on ink */
+  --on-forest: #fff8e8; /* 6.26 on forest */
+  --on-forest-muted: #c0decb; /* 4.59 on forest */
+  --on-moss: #fff8e8; /* 5.56 on moss */
+  --on-moss-muted: #d5e8c9; /* 4.54 on moss */
 
   /* Supporting + accent. Each accent is ground-specific: a single fixed
-     accent cannot clear 3:1 on parchment, ink and forest at once. */
-  --sage: #b9c7b0; /* soft sage — accent on forest (5.29) */
-  --clay: #8a5a3b; /* warm brown — small-text accent on light (4.81) */
-  --terracotta: #b45e3c; /* muted terracotta — large text / UI on light (3.76) */
-  --ember: #c97a56; /* lifted terracotta — accent on ink (5.76) */
-  --silt: #a08f74; /* channel lines, hairlines — never text */
-  --mist: #d8d2c2; /* accent on moss (4.33 large) */
+     accent cannot clear 3:1 on parchment, ink and forest at once. On forest
+     there is no headroom for a second green — only a shift of hue reads as
+     an accent rather than as a second muted, so forest takes the gold. */
+  --gold: #edd98c; /* pale mustard — accent on forest (4.70) */
+  --clay: #9e4222; /* deep terracotta — small-text accent on light (5.57) */
+  --terracotta: #d95d39; /* terracotta — large text / UI on light (3.25) */
+  --ember: #d6a63a; /* golden mustard — accent on ink (7.33) */
+  --silt: #b49a72; /* channel lines, hairlines — never text */
+  --mist: #ddefe5; /* pale mint — accent on moss (4.91) */
 
   /* Hairline rules. Separated from text colours so a rule never gets
      mistaken for a legible ink. */
-  --rule-light: rgb(13 18 16 / 0.14);
-  --rule-dark: rgb(239 233 218 / 0.18);
+  --rule-light: rgb(7 59 42 / 0.14);
+  --rule-dark: rgb(255 248 232 / 0.18);
 
   /* Declared here rather than in `@theme inline`, which resolves its values
      into utilities and never emits the custom property — plain CSS below
@@ -70,7 +79,7 @@
   --color-on-moss-muted: var(--on-moss-muted);
 
   /* Supporting */
-  --color-sage: var(--sage);
+  --color-gold: var(--gold);
   --color-clay: var(--clay);
   --color-terracotta: var(--terracotta);
   --color-ember: var(--ember);

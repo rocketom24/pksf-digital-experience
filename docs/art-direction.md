@@ -40,35 +40,53 @@ Do not copy its layout, branding, text, assets or visual identity.
 
 Tailwind tokens defined in [`app/globals.css`](../app/globals.css) via `@theme`.
 
-| Role | Hex | Tailwind token |
-|---|---|---|
-| Background | `#F5F4EF` | `bg-background` / `text-background` |
-| Primary dark | `#111312` | `bg-ink` / `text-ink` |
-| Muted | `#6A706A` | `text-muted` |
-| White | `#FFFFFF` | `bg-white` / `text-white` |
-| Primary PKSF-inspired green | `#1F6B4F` | `bg-green` / `text-green` |
-| Deep green | `#123F31` | `bg-green-deep` |
-| Soft green | `#DCE9E1` | `bg-green-soft` |
-| Supporting — sand | `#D9C8A4` | `bg-sand` |
-| Supporting — clay | `#9B7653` | `bg-clay` |
-| Supporting — sky | `#B7CCD0` | `bg-sky` |
+Five grounds, each a closed set of a background plus the ink levels and the
+one accent that clear WCAG AA on it. See
+[`components/editorial/grounds.ts`](../components/editorial/grounds.ts) —
+components pick a ground, never a raw colour.
 
-Do not use green for every section.
+| Ground | Hex | Token | Text | Muted | Accent |
+|---|---|---|---|---|---|
+| Soft cream | `#F5EEDC` | `bg-parchment` | 10.88 | 6.34 | clay 5.57 |
+| Warm paper | `#FFF8E8` | `bg-paper` | 11.90 | 6.93 | clay 6.09 |
+| Charcoal | `#10231C` | `bg-ink` | 15.51 | 8.26 | ember 7.33 |
+| PKSF green | `#006A4E` | `bg-forest` | 6.26 | 4.59 | gold 4.70 |
+| Leaf green | `#3F7030` | `bg-moss` | 5.56 | 4.54 | mist 4.91 |
+
+| Supporting | Hex | Token | Use |
+|---|---|---|---|
+| Deep forest | `#073B2A` | `text-on-light` | Ink on the two light grounds |
+| Deep terracotta | `#9E4222` | `text-clay` | Small-text accent on light |
+| Terracotta | `#D95D39` | `text-terracotta` | Large text / UI on light only |
+| Golden mustard | `#D6A63A` | `text-ember` | Accent on ink |
+| Pale mustard | `#EDD98C` | `text-gold` | Accent on forest |
+| Pale mint | `#DDEFE5` | `text-mist` | Accent on moss |
+| Silt | `#B49A72` | `text-silt` | Channels and hairlines. Never text |
+
+Do not use green for every section. Verify every new pairing numerically
+before shipping it — the ratios above are measured, not estimated.
 
 ## Typography
 
-- Display: **Instrument Serif** (`font-display`) — loaded in `app/layout.tsx`
-- UI / body: **Manrope** (`font-sans`, default) — loaded in `app/layout.tsx`
+- Display / UI: **Bricolage Grotesque** (`font-display`, `font-sans`)
+- Prose: **Newsreader** (`font-prose`) — the default `body` face
+- Data, metadata, provenance: **IBM Plex Mono** (`font-mono`)
 
-Responsive clamp-based type scale, defined as Tailwind `@theme` tokens:
+All three loaded in `app/layout.tsx`. Responsive clamp-based type scale,
+defined as Tailwind `@theme` tokens in `app/globals.css`:
 
-| Token | Class | Value |
+| Token | Value | Use |
 |---|---|---|
-| Hero | `text-hero` | `clamp(4rem, 9vw, 9rem)` |
-| Large editorial statement | `text-editorial` | `clamp(3rem, 7vw, 7rem)` |
+| `text-colossal` | `clamp(4rem, 13vw, 13rem)` | Short words holding the viewport |
+| `text-statement` | `clamp(2.6rem, 11.5vw, 11.5rem)` | The same job for a long word |
+| `text-display` | `clamp(2.5rem, 7.5vw, 6.5rem)` | Section headings |
+| `text-headline` | `clamp(2rem, 4.4vw, 3.75rem)` | Sub-sections, menu items |
+| `text-title` | `clamp(1.5rem, 2.6vw, 2.25rem)` | Names in a list, ledger rows |
+| `text-lead` | `clamp(1.125rem, 1.25vw, 1.375rem)` | Lead prose, in the serif |
+| `text-body` | `1.0625rem` | Body prose |
+| `text-meta` | `0.6875rem` | Mono metadata, uppercase, 0.22em |
 
-Do not make every heading huge. Use the standard Tailwind text scale
-(`text-base`, `text-lg`, `text-2xl`, `text-4xl`, …) for everything else.
+Do not make every heading huge.
 
 ## Grid
 

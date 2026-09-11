@@ -118,7 +118,7 @@ const STRATA = [
   { y: 190, h: 96, fill: "var(--silt)", opacity: 0.58 },
   { y: 286, h: 44, fill: "var(--clay)", opacity: 0.46 },
   { y: 330, h: 186, fill: "var(--silt)", opacity: 0.44 },
-  { y: 516, h: 128, fill: "var(--sage)", opacity: 0.85 },
+  { y: 516, h: 128, fill: "var(--moss)", opacity: 0.85 },
   { y: 644, h: 156, fill: "var(--clay)", opacity: 0.38 },
 ];
 

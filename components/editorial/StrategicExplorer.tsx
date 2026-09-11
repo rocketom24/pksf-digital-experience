@@ -39,6 +39,58 @@ const GROUNDS: Ground[] = [
 
 const PLATES: PlateVariant[] = ["delta", "strata", "weave"];
 
+type FactsProps = {
+  item: Intervention;
+  vars: (typeof GROUND_VARS)[Ground];
+  className?: string;
+};
+
+/**
+ * The published evidence under an area: one figure with the period it was
+ * reported for, and the programmes and projects PKSF files here.
+ *
+ * Set as a ruled row and a mono list rather than a card and a set of chips —
+ * the explorer is one composition that changes state, and boxing the
+ * supporting facts would break it into a dashboard. The reporting date is
+ * never dropped: without it the figure reads as current rather than as of a
+ * stated day.
+ */
+function InterventionFacts({ item, vars, className = "" }: FactsProps) {
+  if (!item.stat && !item.examples) return null;
+
+  return (
+    <div
+      className={`border-t pt-6 ${className}`}
+      style={{ borderColor: "color-mix(in srgb, currentColor 18%, transparent)" }}
+    >
+      {item.stat && (
+        <p className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          <span className="font-mono text-title" style={{ color: vars.accent }}>
+            {item.stat.value}
+          </span>
+          <span className="max-w-sm font-mono text-meta uppercase" style={{ color: vars.muted }}>
+            {item.stat.label}
+            <span className="ml-2 opacity-75">— {item.stat.asOf}</span>
+          </span>
+        </p>
+      )}
+
+      {item.examples && (
+        <ul
+          className={`flex flex-wrap gap-x-6 gap-y-2 ${item.stat ? "mt-6" : ""}`}
+          style={{ color: vars.muted }}
+        >
+          {item.examples.map((example) => (
+            <li key={example} className="font-mono text-meta uppercase">
+              {example}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 /**
  * The ten strategic intervention areas.
  *
@@ -166,6 +218,7 @@ export function StrategicExplorer({ items = interventions, className = "" }: Str
                       <p className="text-lead" style={{ color: vars.muted }}>
                         {item.description}
                       </p>
+                      <InterventionFacts item={item} vars={vars} className="mt-8" />
                     </div>
                   </motion.div>
                 )}
@@ -272,6 +325,8 @@ export function StrategicExplorer({ items = interventions, className = "" }: Str
               <p className="relative mt-8 max-w-xl text-lead" style={{ color: vars.muted }}>
                 {active.description}
               </p>
+
+              <InterventionFacts item={active} vars={vars} className="relative mt-10" />
 
               <Frame
                 ratio="wide"

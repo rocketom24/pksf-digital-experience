@@ -72,7 +72,7 @@ export function Hero() {
         <motion.p variants={fade} className={`font-mono text-meta uppercase ${g.muted}`}>
           {organization.fullName}
           <span className="mt-1 block">
-            Established {organization.founded} — Bangladesh
+            Established {organization.foundedOn} — Bangladesh
           </span>
         </motion.p>
         <motion.p
@@ -124,14 +124,15 @@ export function Hero() {
 
         <motion.div variants={fade} className="order-1 max-w-md lg:order-2">
           <p className={`text-lead ${g.muted}`}>
-            An apex development organisation that finances and equips a
-            nationwide network of Partner Organisations — and reaches
-            households only through them.
+            An apex development organisation established by the Government of
+            Bangladesh. It provides financial assistance and institutional
+            development support to Partner Organisations, which implement its
+            programmes at grassroots level.
           </p>
           <ProvenanceMark
-            kind="editorial"
+            kind="verified"
             ground={GROUND_NAME}
-            note="a reading of the published mandate"
+            note="PKSF — About Us"
             className="mt-5"
           />
         </motion.div>

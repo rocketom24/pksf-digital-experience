@@ -2,37 +2,7 @@ import { DeltaChannels } from "@/components/delta/DeltaChannels";
 import { GROUND, type Ground } from "@/components/editorial/grounds";
 import { Meta } from "@/components/editorial/SectionHead";
 import { Reveal } from "@/components/motion/Reveal";
-import { organization } from "@/data/organization";
-
-type Stage = { role: string; name: string; description: string };
-
-/**
- * Every line is a restatement of `organization.mandate`. The relay is the one
- * structural fact about PKSF the concept can state outright: it is an apex
- * body, so it reaches households through Partner Organisations rather than
- * directly. The numbering is kept because the sequence is real — money and
- * capacity genuinely move in this order.
- */
-const STAGES: Stage[] = [
-  {
-    role: "Apex",
-    name: organization.shortName,
-    description:
-      "Channels funds, capacity building and policy support. It does not deliver services to households itself.",
-  },
-  {
-    role: "Network",
-    name: "Partner Organisations",
-    description:
-      "A nationwide network of organisations that receive that support and operate locally, close to the people they serve.",
-  },
-  {
-    role: "Last mile",
-    name: "Communities",
-    description:
-      "Rural and low-income communities receive microfinance, microenterprise and social development services where they live.",
-  },
-];
+import { relay } from "@/data/organization";
 
 type DeltaRelayProps = { ground?: Ground; className?: string };
 
@@ -40,10 +10,10 @@ type DeltaRelayProps = { ground?: Ground; className?: string };
  * The relay, drawn as what it is.
  *
  * One channel divides into a network, and the network divides again before it
- * reaches the coast. The branching is the content: the number of Partner
- * Organisations is not published anywhere this concept can cite, so the
- * diagram shows a network rather than a count, and the outlets along the
- * bottom are a coastline rather than a countable set of end points.
+ * reaches the coast. The branching is the content: PKSF publishes 200+
+ * Partner Organisations running roughly 17,000 branch offices, so the drawing
+ * shows a network dividing rather than a countable set of end points, and the
+ * published counts sit against the stages they belong to.
  *
  * The legend and the drawing occupy separate columns. An earlier version laid
  * the labels over a full-width delta, and the second generation of channels
@@ -71,7 +41,7 @@ export function DeltaRelay({ ground = "parchment", className = "" }: DeltaRelayP
             column, so each one reads against its own level of the drawing
             beside it rather than all three stacking at the top. */}
         <ol className="flex flex-col gap-16 lg:col-span-5 lg:min-h-[44rem] lg:justify-between lg:gap-0">
-          {STAGES.map((stage, i) => (
+          {relay.map((stage, i) => (
             <li key={stage.name}>
               <Reveal delay={i * 0.12}>
                 <span className="flex items-baseline gap-3">
@@ -84,6 +54,15 @@ export function DeltaRelay({ ground = "parchment", className = "" }: DeltaRelayP
                   {stage.name}
                 </h3>
                 <p className={`mt-4 max-w-sm text-body ${g.muted}`}>{stage.description}</p>
+                {stage.figure && (
+                  <p className={`mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t pt-4 ${g.border}`}>
+                    <span className="font-mono text-title">{stage.figure.value}</span>
+                    <span className={`font-mono text-meta uppercase ${g.muted}`}>
+                      {stage.figure.label}
+                      <span className="ml-2 opacity-75">{stage.figure.asOf}</span>
+                    </span>
+                  </p>
+                )}
               </Reveal>
             </li>
           ))}

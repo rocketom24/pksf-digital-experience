@@ -2,20 +2,41 @@ export type JourneyMilestone = {
   year: number;
   title: string;
   description?: string;
+  source: string;
 };
 
 /**
- * Historical timeline. Only verified milestones get a hard year.
- * Do not fabricate dates — add a TODO entry instead and verify against
- * an official PKSF source before publishing.
+ * Institutional milestones with a verified year attached.
+ *
+ * Only entries PKSF dates itself. The digital milestones live in
+ * `data/digital.ts` and are not repeated here.
  */
 export const journey: JourneyMilestone[] = [
   {
     year: 1989,
     title: "PKSF established",
+    description:
+      "Formally came into being on 13 November 1989, after the President of Bangladesh approved the proposal.",
+    source: "PKSF — About Us",
   },
-  // TODO: verify year — expansion of the Partner Organisation (PO) network.
-  // TODO: verify year — introduction of microenterprise and SME-focused financing.
-  // TODO: verify year — launch of major disaster/climate resilience programming.
-  // TODO: verify year — governance/legal structure milestones.
+  {
+    year: 2001,
+    title: "Microenterprise programme launched",
+    description:
+      "Financing for members whose activities had outgrown ordinary microcredit.",
+    source: "PKSF — Microenterprise",
+  },
+  {
+    year: 2010,
+    title: "ENRICH begins",
+    description:
+      "The flagship human-centred programme against multidimensional poverty.",
+    source: "PKSF — Programs",
+  },
+  {
+    year: 2025,
+    title: "Strategic Plan 2025–2030 adopted",
+    description: "‘Financing Inclusive Growth’ — three strategic objectives to 2030.",
+    source: "PKSF Strategic Plan 2025–2030",
+  },
 ];

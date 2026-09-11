@@ -3,10 +3,10 @@ import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { Frame } from "@/components/editorial/Frame";
 import { Ground } from "@/components/editorial/Ground";
+import { IndexRow } from "@/components/editorial/IndexRow";
 import { Meta, SectionHead } from "@/components/editorial/SectionHead";
 import { StatementSequence, type StatementWord } from "@/components/editorial/StatementSequence";
 import { StrategicExplorer } from "@/components/editorial/StrategicExplorer";
-import { AwaitingSource } from "@/components/home/AwaitingSource";
 import { DeltaRelay } from "@/components/home/DeltaRelay";
 import { DigitalDirection } from "@/components/home/DigitalDirection";
 import { DigitalTimeline } from "@/components/home/DigitalTimeline";
@@ -19,33 +19,30 @@ import { Button } from "@/components/ui/Button";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { interventions } from "@/data/interventions";
+import { news } from "@/data/news";
+import { organization, strategicPlan } from "@/data/organization";
+import { programs } from "@/data/programs";
+import { projects } from "@/data/projects";
+import { publications } from "@/data/publications";
 
 /** Shared vertical rhythm for the storytelling sections. */
 const RHYTHM = "py-24 md:py-32 lg:py-40";
 
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+
+const interventionName = (slug: string) =>
+  interventions.find((item) => item.slug === slug)?.name ?? "";
+
 /**
- * Three themes read across the ten published intervention areas. Each gloss
- * names the areas it is drawn from, so the reading is checkable against
- * `data/interventions.ts` rather than asserted. These are not PKSF slogans
- * and the sequence is marked as an editorial reading wherever it appears.
+ * The three strategic objectives of the Strategic Plan 2025–2030, held on the
+ * statement stage. The single word is a heading this page supplies — it has to
+ * be one short word to hold the viewport — and the objective under it is
+ * PKSF's own wording, unaltered. The provenance line says which is which.
  */
-const THEMES: StatementWord[] = [
-  {
-    word: "Opportunity",
-    gloss:
-      "Inclusive Finance and Microenterprise Development — access to capital, and a route to grow something with it.",
-  },
-  {
-    word: "Resilience",
-    gloss:
-      "Climate Action and Building Resilience — livelihoods that survive the shock, and recover after it.",
-  },
-  {
-    word: "Capacity",
-    gloss:
-      "Human Capacity, and Knowledge, Communication & Advocacy — the skills of the network, and the evidence it works from.",
-  },
-];
+const THEMES: StatementWord[] = strategicPlan.objectives.map((objective) => ({
+  word: objective.label,
+  gloss: objective.objective,
+}));
 
 export default function Home() {
   return (
@@ -68,13 +65,13 @@ export default function Home() {
         <Ground ground="ink" id="themes" marker="01">
           <StatementSequence
             words={THEMES}
-            label="What the work is organised around"
+            label={`Strategic Plan ${strategicPlan.period} — ${strategicPlan.theme}`}
             ground="ink"
             footnote={
               <ProvenanceMark
-                kind="editorial"
+                kind="verified"
                 ground="ink"
-                note={`a reading across the ${interventions.length} published intervention areas — not an official slogan`}
+                note={`the three objectives, as published in the ${strategicPlan.source}. The single word above each one is this page's heading, not PKSF's.`}
               />
             }
           />
@@ -90,18 +87,19 @@ export default function Home() {
               className="absolute inset-0 -z-10 [&>div]:h-full"
             />
             <Container>
-              <Reveal>
+              <Meta ground="forest">The vision, in PKSF&rsquo;s own words</Meta>
+              <Reveal className="mt-8">
                 {/* Set past the measure on purpose: the line runs off the
                     right edge the way the network runs past the centre. The
                     section clips on x, so it never produces a scrollbar. */}
                 <p className="max-w-[16ch] font-display text-display font-bold uppercase md:max-w-[24ch]">
-                  Everything it funds arrives through someone else
+                  {organization.vision}
                 </p>
               </Reveal>
               <ProvenanceMark
-                kind="editorial"
+                kind="verified"
                 ground="forest"
-                note="a reading of the published mandate"
+                note="PKSF — Our Vision, verbatim"
                 className="mt-8"
               />
             </Container>
@@ -115,10 +113,25 @@ export default function Home() {
               label="The model"
               heading="Three steps between a fund and a household."
               note="PKSF does not reach communities directly. It makes it possible for others to."
-              aside={
-                <ProvenanceMark kind="verified" note="restated from the published mandate" />
-              }
+              aside={<ProvenanceMark kind="verified" note="PKSF — About Us" />}
             />
+
+            {/* The mission, verbatim. It is a formal commitment, so it is set
+                as a quotation rather than restated in the page's own voice. */}
+            <Reveal className="mt-20 lg:mt-28">
+              <figure className="m-0 max-w-4xl">
+                <Meta>The mission</Meta>
+                <blockquote className="mt-6">
+                  <p className="font-prose text-headline italic">
+                    &ldquo;{organization.mission}&rdquo;
+                  </p>
+                </blockquote>
+                <figcaption className="mt-6">
+                  <ProvenanceMark kind="verified" note="PKSF — Our Mission, verbatim" />
+                </figcaption>
+              </figure>
+            </Reveal>
+
             <DeltaRelay className="mt-24 lg:mt-32" />
           </Container>
         </Ground>
@@ -128,9 +141,16 @@ export default function Home() {
           <Container className={RHYTHM}>
             <SectionHead
               label="The ledger"
-              heading="What can be verified, and what will not be invented."
+              heading="What the network holds, on one stated day."
               ground="ink"
-              note="Two figures are checkable from the published record. Four are not, and are left open."
+              note="Every figure is published by PKSF against a reporting date, and is shown with it."
+              aside={
+                <ProvenanceMark
+                  kind="verified"
+                  ground="ink"
+                  note="PKSF — At a Glance, 30 April 2026"
+                />
+              }
             />
             <ImpactLedger ground="ink" className="mt-20 lg:mt-28" />
           </Container>
@@ -146,7 +166,7 @@ export default function Home() {
               aside={
                 <ProvenanceMark
                   kind="verified"
-                  note="names as published; descriptions are editorial summaries"
+                  note="names and figures as published; the descriptions are shortened, not rewritten"
                 />
               }
             />
@@ -173,7 +193,11 @@ export default function Home() {
               ground="ink"
               note="Five published eras. Each one changed what the network could see about itself."
               aside={
-                <ProvenanceMark kind="verified" ground="ink" note="data/digital.ts — no milestones added" />
+                <ProvenanceMark
+                  kind="verified"
+                  ground="ink"
+                  note="PKSF — Digital Transformation; no milestones added"
+                />
               }
             />
           </Container>
@@ -192,32 +216,142 @@ export default function Home() {
           <Container className={RHYTHM}>
             <SectionHead
               label="The desk"
-              heading="Three sections, waiting on sources."
-              note="Programmes, publications and news must be right to the item. Their data files are in place and deliberately empty."
+              heading="The instruments, and what they are currently funding."
+              note="Programmes are PKSF's standing instruments. Projects are time-bound and co-financed."
+              aside={
+                <ProvenanceMark
+                  kind="verified"
+                  note="PKSF — Programs, Projects, Annual Reports and News Center"
+                />
+              }
             />
 
-            <div className="mt-20 border-b border-on-light/14 lg:mt-28">
-              <AwaitingSource
-                id="programs"
-                index="01"
-                title="Programmes & projects"
-                what="A curated selection of live programmes and projects, each filed under one of the ten intervention areas, with its own scope and location."
-                needs="official programme and project listings"
-              />
-              <AwaitingSource
-                id="knowledge"
-                index="02"
-                title="Knowledge"
-                what="Research, evaluations, annual reports and policy work — the evidence base an apex institution publishes and is judged on."
-                needs="a publication index with titles, years and links"
-              />
-              <AwaitingSource
-                id="news"
-                index="03"
-                title="News & updates"
-                what="A restrained, dated editorial list of announcements and institutional activity, newest first."
-                needs="officially issued, dated releases"
-              />
+            {/* ── Programmes ───────────────────────────────────────────── */}
+            <div id="programs" className="mt-20 scroll-mt-28 lg:mt-28">
+              <h3>
+                <Meta>01 — Programmes</Meta>
+              </h3>
+              <p className="mt-6 max-w-xl text-lead text-muted">
+                The standing instruments, each filed under one of the ten
+                intervention areas. Delivered by Partner Organisations, not by
+                PKSF.
+              </p>
+
+              <div className="mt-12 border-b border-on-light/14">
+                {programs.map((program, i) => (
+                  <IndexRow
+                    key={program.slug}
+                    index={pad(i)}
+                    title={program.name}
+                    kicker={program.fullName ?? interventionName(program.interventionSlug)}
+                    footer={
+                      program.fullName ? (
+                        <Meta>{interventionName(program.interventionSlug)}</Meta>
+                      ) : undefined
+                    }
+                  >
+                    {program.summary}
+                  </IndexRow>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Projects ─────────────────────────────────────────────── */}
+            <div id="projects" className="mt-24 scroll-mt-28 lg:mt-32">
+              <h3>
+                <Meta>02 — Projects</Meta>
+              </h3>
+              <p className="mt-6 max-w-xl text-lead text-muted">
+                Time-bound and co-financed. Status, duration and partners are
+                as PKSF publishes them — never inferred from the dates.
+              </p>
+
+              <div className="mt-12 border-b border-on-light/14">
+                {projects.map((project, i) => (
+                  <IndexRow
+                    key={project.slug}
+                    index={pad(i)}
+                    title={project.name}
+                    kicker={project.fullName}
+                    meta={[
+                      {
+                        label: "Status",
+                        value: project.status === "ongoing" ? "Ongoing" : "Completed",
+                      },
+                      ...(project.duration
+                        ? [{ label: "Duration", value: project.duration }]
+                        : []),
+                      ...(project.budget ? [{ label: "Financing", value: project.budget }] : []),
+                      ...(project.partners
+                        ? [{ label: "Partners", value: project.partners.join(", ") }]
+                        : []),
+                      ...(project.targetGroup
+                        ? [{ label: "Target group", value: project.targetGroup }]
+                        : []),
+                    ]}
+                    footer={<ProvenanceMark kind="verified" note={project.source} />}
+                  >
+                    {project.summary}
+                  </IndexRow>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Knowledge ────────────────────────────────────────────── */}
+            <div id="knowledge" className="mt-24 scroll-mt-28 lg:mt-32">
+              <h3>
+                <Meta>03 — Knowledge</Meta>
+              </h3>
+              <p className="mt-6 max-w-xl text-lead text-muted">
+                What an apex institution publishes, and is judged on. Links go
+                to PKSF&rsquo;s own files.
+              </p>
+
+              <div className="mt-12 border-b border-on-light/14">
+                {publications.map((publication, i) => (
+                  <IndexRow
+                    key={publication.slug}
+                    index={pad(i)}
+                    title={publication.title}
+                    kicker={`${publication.type} — ${publication.year}`}
+                    footer={
+                      <Button href={publication.url} target="_blank" rel="noreferrer">
+                        Open on pksf.org.bd
+                      </Button>
+                    }
+                  >
+                    {publication.note}
+                  </IndexRow>
+                ))}
+              </div>
+            </div>
+
+            {/* ── News ─────────────────────────────────────────────────── */}
+            <div id="news" className="mt-24 scroll-mt-28 lg:mt-32">
+              <h3>
+                <Meta>04 — News</Meta>
+              </h3>
+              <p className="mt-6 max-w-xl text-lead text-muted">
+                A short, dated selection issued by PKSF. Newest first.
+              </p>
+
+              <div className="mt-12 border-b border-on-light/14">
+                {news.map((item, i) => (
+                  <IndexRow
+                    key={item.slug}
+                    index={pad(i)}
+                    title={item.title}
+                    kicker={item.displayDate}
+                    footer={
+                      <Button href={item.url} target="_blank" rel="noreferrer">
+                        Read on pksf.org.bd
+                      </Button>
+                    }
+                  >
+                    {item.summary}
+                  </IndexRow>
+                ))}
+              </div>
             </div>
           </Container>
         </Ground>
@@ -233,12 +367,14 @@ export default function Home() {
             </Reveal>
             <Reveal delay={0.12} className="mt-14 flex flex-wrap items-center gap-x-12 gap-y-6">
               <Button href="#interventions">Explore the ten interventions</Button>
-              <Button href="/design-system">Open the design system</Button>
+              <Button href={organization.website} target="_blank" rel="noreferrer">
+                Visit pksf.org.bd
+              </Button>
             </Reveal>
             <ProvenanceMark
               kind="editorial"
               ground="ink"
-              note="a reading of the published mandate"
+              note="a reading of the published mandate — PKSF reaches households through its Partner Organisations"
               className="mt-12"
             />
           </Container>

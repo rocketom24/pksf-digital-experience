@@ -34,53 +34,53 @@ const GROUNDS: {
 }[] = [
   {
     name: "parchment",
-    hex: "#EFE9DA",
-    role: "The light ground. Reading, indexes, the desk.",
-    text: "ink 15.6:1",
-    muted: "5.43:1",
-    accent: "clay 4.81:1",
+    hex: "#F5EEDC",
+    role: "Soft cream. The light ground — reading, indexes, the desk.",
+    text: "deep forest 10.88:1",
+    muted: "6.34:1",
+    accent: "clay 5.57:1",
   },
   {
     name: "paper",
-    hex: "#FAF6EC",
-    role: "Raised paper. Insets and one intervention.",
-    text: "ink 17.5:1",
-    muted: "6.09:1",
-    accent: "clay 5.40:1",
+    hex: "#FFF8E8",
+    role: "Warm paper. Insets and one intervention.",
+    text: "deep forest 11.90:1",
+    muted: "6.93:1",
+    accent: "clay 6.09:1",
   },
   {
     name: "ink",
-    hex: "#0D1210",
-    role: "Near-black green. Statements, ledger, close.",
-    text: "parchment 15.6:1",
-    muted: "8.03:1",
-    accent: "ember 5.76:1",
+    hex: "#10231C",
+    role: "Charcoal. Statements, ledger, close.",
+    text: "paper 15.51:1",
+    muted: "8.26:1",
+    accent: "ember 7.33:1",
   },
   {
     name: "forest",
-    hex: "#14503B",
-    role: "Primary. The delta, the vision.",
-    text: "paper 8.69:1",
-    muted: "4.76:1",
-    accent: "sage 5.29:1",
+    hex: "#006A4E",
+    role: "PKSF green. Primary — the delta, the vision.",
+    text: "paper 6.26:1",
+    muted: "4.59:1",
+    accent: "gold 4.70:1",
   },
   {
     name: "moss",
-    hex: "#55632F",
-    role: "Secondary. Land, growth, the human story.",
-    text: "paper 6.06:1",
-    muted: "4.78:1",
-    accent: "mist 4.33:1",
+    hex: "#3F7030",
+    role: "Leaf green. Secondary — land, growth, the human story.",
+    text: "paper 5.56:1",
+    muted: "4.54:1",
+    accent: "mist 4.91:1",
   },
 ];
 
 const SUPPORTING = [
-  { name: "sage", hex: "#B9C7B0", use: "Accent on forest. Small text safe." },
-  { name: "mist", hex: "#D8D2C2", use: "Accent on moss. Large text and UI." },
-  { name: "silt", hex: "#A08F74", use: "Delta channels and hairlines. Never text." },
-  { name: "clay", hex: "#8A5A3B", use: "Accent on light grounds. Small text safe." },
-  { name: "terracotta", hex: "#B45E3C", use: "Large text and UI on light grounds only." },
-  { name: "ember", hex: "#C97A56", use: "Accent on ink. Small text safe." },
+  { name: "gold", hex: "#EDD98C", use: "Pale mustard. Accent on forest. Small text safe." },
+  { name: "mist", hex: "#DDEFE5", use: "Pale mint. Accent on moss. Small text safe." },
+  { name: "silt", hex: "#B49A72", use: "Delta channels and hairlines. Never text." },
+  { name: "clay", hex: "#9E4222", use: "Deep terracotta. Accent on light grounds. Small text safe." },
+  { name: "terracotta", hex: "#D95D39", use: "Large text and UI on light grounds only." },
+  { name: "ember", hex: "#D6A63A", use: "Golden mustard. Accent on ink. Small text safe." },
 ];
 
 const TYPE_SCALE = [
@@ -127,7 +127,7 @@ export default function DesignSystem() {
             <Container className="flex min-h-[70svh] flex-col justify-end pb-16 pt-32">
               <Meta ground="ink">Design system</Meta>
               <h1 className="mt-8 max-w-[14ch] font-display text-display font-bold uppercase">
-                Silt and canopy
+                Delta, canopy and sunlight
               </h1>
               <p className={`mt-8 max-w-xl text-lead ${GROUND.ink.muted}`}>
                 The working parts of the PKSF concept: five grounds and the ink
@@ -202,10 +202,12 @@ export default function DesignSystem() {
             </ul>
 
             <p className="mt-12 max-w-2xl text-body text-muted">
-              There is no single brand accent. Terracotta clears 3.76:1 on
-              parchment and 4.15:1 on ink but collapses to 2.06:1 on forest, so
-              forest takes sage instead. Picking the accent from the ground,
-              rather than from the brand, is what keeps every pairing legible.
+              There is no single brand accent. Deep terracotta clears 5.57:1 on
+              parchment but only 1.03:1 on PKSF green, and on that ground there
+              is no headroom for a second green either — only a shift of hue
+              reads as an accent, so forest takes the gold. Picking the accent
+              from the ground, rather than from the brand, is what keeps every
+              pairing legible.
             </p>
           </Container>
         </Ground>

@@ -20,10 +20,30 @@ export function Footer() {
         <div className={`grid grid-cols-1 gap-10 border-t pt-10 md:grid-cols-12 ${g.border}`}>
           <div className="md:col-span-5">
             <Meta ground="ink">{organization.fullName}</Meta>
-            <p className={`mt-4 max-w-sm text-body ${g.muted}`}>
+            {/* The published head-office address, reproduced so the concept
+                points at the real institution rather than standing in for it. */}
+            <address className={`mt-4 not-italic text-body ${g.muted}`}>
+              {organization.headquarters.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
+              <a
+                href={`mailto:${organization.email}`}
+                data-cursor="interactive"
+                className={`mt-4 block underline-offset-4 hover:underline ${g.accent}`}
+              >
+                {organization.email}
+              </a>
+              <span className="mt-2 block font-mono text-meta uppercase">
+                {organization.phones.join(" · ")}
+              </span>
+            </address>
+            <p className={`mt-6 max-w-sm text-body ${g.muted}`}>
               An independent, unofficial concept design project. It is not
               affiliated with, endorsed by, or representative of{" "}
-              {organization.fullName} ({organization.shortName}).
+              {organization.fullName} ({organization.shortName}). Every fact on
+              this site is sourced from PKSF&rsquo;s own publications.
             </p>
           </div>
 
@@ -46,7 +66,18 @@ export function Footer() {
 
           <div className="md:col-span-2 md:col-start-11">
             <Meta ground="ink">Reference</Meta>
-            <ul className="mt-4">
+            <ul className="mt-4 space-y-2">
+              <li>
+                <a
+                  href={organization.website}
+                  target="_blank"
+                  rel="noreferrer"
+                  data-cursor="interactive"
+                  className={`text-body transition-opacity duration-200 hover:opacity-100 motion-reduce:transition-none ${g.muted}`}
+                >
+                  pksf.org.bd
+                </a>
+              </li>
               <li>
                 <Link
                   href="/design-system"

@@ -4,23 +4,26 @@ import { Meta } from "@/components/editorial/SectionHead";
 import { ProvenanceMark } from "@/components/home/ProvenanceMark";
 import { Reveal } from "@/components/motion/Reveal";
 import { Button } from "@/components/ui/Button";
+import { stories } from "@/data/stories";
 
 type HumanStoryProps = { ground?: Ground; className?: string };
 
 /**
- * The section a person's story will hold.
+ * One person, as PKSF published her.
  *
- * It is built as pinned image storytelling now, so the arrangement does not
- * change when there is a photograph: the frame sticks for the length of the
- * text beside it, which is the shape a portrait and an account want. Today
- * the frame holds a plate.
+ * Pinned image storytelling: the frame holds while the account beside it
+ * scrolls, which is the shape a portrait and a first-person record want. The
+ * frame is reserved for the photograph published with the account — until
+ * that is sourced it holds a plate, and the caption says which.
  *
- * This is the one section where invention would do real harm — a fabricated
- * beneficiary, or stock photography that reads as one, is a lie about a real
- * person. So it stays open, and says what it is waiting for.
+ * Every fact below comes from PKSF's own write-up, linked. There is no
+ * quotation, because the source carries none: attributing an invented
+ * sentence to a named woman in Pabna would be the one invention on this page
+ * that does real harm.
  */
 export function HumanStory({ ground = "moss", className = "" }: HumanStoryProps) {
   const g = GROUND[ground];
+  const story = stories[0];
 
   return (
     <div className={`grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16 ${className}`}>
@@ -34,7 +37,7 @@ export function HumanStory({ ground = "moss", className = "" }: HumanStoryProps)
             plate="weave"
             treatment="crop"
             ground={ground}
-            caption="Reserved for a documented, consented portrait"
+            caption={`Reserved for the photograph published with this account — ${story.source}`}
           />
         </div>
       </div>
@@ -44,32 +47,44 @@ export function HumanStory({ ground = "moss", className = "" }: HumanStoryProps)
 
         <Reveal className="mt-8">
           <h2 className="max-w-2xl font-display text-display font-semibold text-balance">
-            The people belong here. Their permission comes first.
+            {story.name}
           </h2>
-        </Reveal>
-
-        <Reveal delay={0.12} className="mt-10 space-y-6">
-          <p className={`max-w-lg text-lead ${g.muted}`}>
-            This is where one person&rsquo;s account would carry the page — a
-            name, a district, a photograph, and what changed. It is also the
-            one section where invention would do real harm, so it stays open
-            until there is a documented, consented account to publish.
-          </p>
-          <p className={`max-w-lg text-lead ${g.muted}`}>
-            Until then, the strongest true thing this concept can say is the
-            shape of the work: services delivered locally, by organisations
-            that are already there.
+          <p className={`mt-5 font-mono text-meta uppercase ${g.accent}`}>
+            {story.age ? `${story.age} — ` : ""}
+            {story.location}
           </p>
         </Reveal>
 
-        <Reveal delay={0.2} className="mt-12">
-          <Button href="#interventions">See what the work covers</Button>
+        <Reveal delay={0.12} className="mt-10">
+          <p className={`max-w-lg text-lead ${g.muted}`}>{story.summary}</p>
+        </Reveal>
+
+        {story.facts && (
+          <Reveal delay={0.18} className="mt-12">
+            <dl className={`border-t ${g.border}`}>
+              {story.facts.map((fact) => (
+                <div
+                  key={fact.label}
+                  className={`flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 border-b py-4 ${g.border}`}
+                >
+                  <dt className="font-mono text-title">{fact.value}</dt>
+                  <dd className={`font-mono text-meta uppercase ${g.muted}`}>{fact.label}</dd>
+                </div>
+              ))}
+            </dl>
+          </Reveal>
+        )}
+
+        <Reveal delay={0.24} className="mt-12">
+          <Button href={story.url} target="_blank" rel="noreferrer">
+            Read the account on PKSF
+          </Button>
         </Reveal>
 
         <ProvenanceMark
-          kind="pending"
+          kind="verified"
           ground={ground}
-          note="a named, consented account from a verified source"
+          note={`${story.source}, published ${story.published}. No sentence here is attributed to her as a quotation.`}
           className={`mt-14 border-t pt-6 ${g.border}`}
         />
       </div>
