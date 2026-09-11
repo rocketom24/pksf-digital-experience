@@ -13,21 +13,28 @@ import { organization } from "@/data/organization";
  *
  * ── The composition ───────────────────────────────────────────────────────
  * One photograph, edge to edge, holding the whole viewport — ungraded,
- * untinted, nothing drawn over it at all. The type is spread across the
- * frame the way an editorial page uses its margins: a label at the head, the
- * statement through the middle, a sentence and three figures along the foot.
+ * untinted, no overall scrim on it. The type is spread across the frame the
+ * way an editorial page uses its margins: a label at the head, the statement
+ * through the middle, a sentence and three figures along the foot.
  *
- * Nothing between the type and the picture. Sampling the photograph at every
- * ninth pixel, the worst case for #FFF8E8 is 1.0:1 in its top sixth and
- * 1.0:1 in its bottom eighteenth — it is a mustard field in full sun, and
- * there is nowhere on it that paper-coloured type is readable unaided. Every
- * way of fixing that at the scale of the *section* costs the photograph: a
- * band at each edge reads as two bars, an even grade multiplies a yellow
- * field by a green ink and turns it olive, a panel simply covers the picture
- * up. So the contrast is carried at the scale of the *type* instead — a
- * tight deep-forest halo that travels with the glyphs (`.on-photo` in
- * globals.css) and, on the statement, a real stroke that large type can
- * carry. The field runs uninterrupted underneath all of it.
+ * The statement sits on the bare picture, in charcoal: at that size it is
+ * 13.6:1 on the field's brightest pixel. The 11px mono cannot — it is a
+ * mustard field in full sun, and the worst ground it offers the head is
+ * rgb(64,74,0) and the foot rgb(55,43,3), where haloed charcoal is 1.7:1 and
+ * 1.2:1. So the two ends of the frame take a readability zone each
+ * (`.hero-band-top` / `.hero-band-bottom`, globals.css).
+ *
+ * They are not the same colour. The head is cream and keeps the charcoal ink,
+ * because the PKSF lockup sits in it — the mark is green-on-white artwork and
+ * its wordmark disappears on a dark band. The foot is a charcoal scrim and
+ * its type inverts to cream (`.hero-zone-ink`), which lets the figures read
+ * as a printed colophon and keeps the picture's own colour: a green ground
+ * multiplied into a yellow field goes olive and takes the red out of the
+ * farmer's shawl, where the near-black darkens without moving a hue.
+ *
+ * The middle, where the statement and the farmer are, is the photograph and
+ * nothing else; each zone is only as deep as the type it carries, and fades
+ * from there into the picture.
  *
  * The headline is one sentence set in two voices: the claim in the display
  * grotesque at full size, and the connective clause — the part that actually
@@ -40,16 +47,15 @@ import { organization } from "@/data/organization";
  * and equips others and the others are what reach households.
  *
  * ── Contrast ──────────────────────────────────────────────────────────────
- *   #FFF8E8 on #073B2A                   → 11.09 : 1   the block, all of it
- *   #FFF8E8 inside a #073B2A stroke      → 11.09 : 1   the statement
- *   #FFF8E8 on #073B2A                   → 11.09 : 1   the bar
+ * Against the worst pixel each zone can put behind its own ink — the darkest
+ * under the head's charcoal, the brightest under the foot's cream:
+ *   #10231C on the head plateau          →  9.27 : 1   the bar, the label
+ *   #FFF8E8 on the foot plateau          →  6.04 : 1   sentence, figures,
+ *                                                      labels, cue, source
+ *   #10231C on the field's brightest px  → 13.60 : 1   the statement
  *
- * The statement is drawn with `paint-order: stroke fill`, so every glyph
- * carries its own ground: a 0.05em deep-forest edge laid down before the
- * fill. It is the one way large type can sit directly on an unmodified
- * photograph and still have a number attached to it. Nothing in this section
- * is set in a muted ink or at reduced opacity — hierarchy is size, weight and
- * tracking. Quiet, not faint.
+ * Nothing in this section is set in a muted ink or at reduced opacity —
+ * hierarchy is size, weight, tracking and placement. Quiet, not faint.
  */
 
 export function Hero() {
@@ -89,6 +95,25 @@ export function Hero() {
       opacity: 1,
       y: 0,
       transition: { duration: DURATION.editorial, ease: EASE_EDITORIAL },
+    },
+  };
+
+  /**
+   * The two readability zones, which arrive with the picture rather than
+   * before it. They are not inside the mask — each is a child of the block it
+   * protects, so that it can be exactly as deep as that block — which means
+   * that at the first frame of the entrance, while the mask is still an inset
+   * and the clipped strips are page ground rather than photograph, a zone
+   * would otherwise paint a flat rectangle across the top and foot of the
+   * frame. Fading them over the same cinematic beat hides that: by the time
+   * either is legible the mask has opened under it. No `y`, unlike `fade` —
+   * a gradient this soft cannot be seen to move, so moving it is only work.
+   */
+  const veil = {
+    hidden: { opacity: 0 },
+    shown: {
+      opacity: 1,
+      transition: { duration: DURATION.cinematic, ease: EASE_EDITORIAL },
     },
   };
 
@@ -155,8 +180,22 @@ export function Hero() {
           logo. */}
       <motion.div
         variants={{ hidden: {}, shown: { transition: { staggerChildren: 0.08 } } }}
-        className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3"
+        className="relative flex flex-wrap items-start justify-between gap-x-6 gap-y-3"
       >
+        {/* The head's readability zone (`.hero-band-top`, globals.css).
+            Drawn as a child of the label so its plateau is exactly as deep as
+            the label turns out to be — two lines on a wide screen, three on a
+            tablet where the legal status wraps — and stretched up past the
+            section's top padding to the edge of the viewport, so it is under
+            the fixed bar as well. The bar is transparent over the hero and
+            takes the same ink; the zone belongs to the photograph rather than
+            to the bar, and scrolls away with it, by which point the bar has
+            taken its own parchment ground. */}
+        <motion.span
+          aria-hidden="true"
+          variants={veil}
+          className="hero-band-top pointer-events-none absolute inset-x-[-100vw] -top-22 bottom-[-11rem] -z-10"
+        />
         <motion.p variants={fade} className="font-mono text-meta uppercase">
           {organization.fullName}
           <span className="mt-1 block">Est. {organization.founded} · Bangladesh</span>
@@ -202,32 +241,28 @@ export function Hero() {
 
       {/* ── The foot ──────────────────────────────────────────────────────
           Spread across the frame rather than collected into a panel: a
-          sentence, three figures, and the way down. Nothing here has a
-          ground of its own — the halo travels with the glyphs, so the
-          photograph runs uninterrupted underneath all of it. */}
+          sentence, three figures, and the way down. The ground under it is
+          the foot's readability zone, which has no edge of its own — it is
+          the width of the frame and it fades upward into the picture. */}
       <motion.div
         variants={{ hidden: {}, shown: { transition: { staggerChildren: 0.09 } } }}
         /* Held to the left of the farmer. He is the one part of the frame
            dark enough to fight charcoal type, and he stands at about 58% of
            the width at every wide viewport — so the foot stops short of him
            rather than relying on the halo to rescue the third figure. */
-        className="relative sm:max-w-[64%] lg:max-w-[46vw]"
+        className="hero-zone-ink relative sm:max-w-[64%] lg:max-w-[46vw]"
       >
-        {/* Phone only. At 390px the farmer fills most of the frame and there
-            is nowhere to put the foot that is not on top of him — so instead
-            of moving the type, the picture is lifted behind it. A *cream*
-            wash, not a dark one: the ink here is charcoal, so the ground
-            under it has to go lighter, and cream over a sunlit mustard field
-            reads as haze rather than as a panel. 66% over the darkest pixel
-            the photograph can present puts #10231C at 6.7:1; the plateau
-            covers the type and the top sixth fades out into the picture. */}
-        <span
+        {/* The foot's readability zone (`.hero-band-bottom`, globals.css).
+            Drawn as a child of the foot so it is exactly as tall as what it
+            protects — a sentence, three figures and the provenance — however
+            those reflow, and bled past the section's own padding to the edges
+            of the frame so it reads as the foot of the photograph rather than
+            as a panel sitting on the left of it. The horizontal bleed is
+            clipped by the section's `overflow-x-clip`. */}
+        <motion.span
           aria-hidden="true"
-          className="pointer-events-none absolute -inset-x-4.5 -bottom-8 -top-24 -z-10 sm:hidden"
-          style={{
-            backgroundImage:
-              "linear-gradient(to top, rgb(255 248 232 / 0.66) 0%, rgb(255 248 232 / 0.66) 84%, rgb(255 248 232 / 0) 100%)",
-          }}
+          variants={veil}
+          className="hero-band-bottom pointer-events-none absolute inset-x-[-100vw] -bottom-6 -top-40 -z-10 sm:-top-72 md:-bottom-7"
         />
         <motion.p variants={fade} className="max-w-[62ch] text-lead">
           An apex development organisation of the Government of Bangladesh. It
@@ -248,7 +283,7 @@ export function Hero() {
           className="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {heroFacts.map((fact) => (
-            <div key={fact.label} className="border-t border-on-light/35 pt-4">
+            <div key={fact.label} className="border-t border-on-light/35 sm:border-on-dark/35 pt-4">
               <dt className="sr-only">{fact.label}</dt>
               <dd className="m-0">
                 <span className="block font-display text-headline font-bold leading-none tracking-tight">
@@ -263,9 +298,9 @@ export function Hero() {
 
         <motion.div
           variants={fade}
-          className="mt-4 flex flex-col gap-4 border-t border-on-light/35 pt-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
+          className="mt-4 flex flex-col gap-4 border-t border-on-light/35 sm:border-on-dark/35 pt-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
         >
-          <ScrollCue href="#themes" ground="parchment" tone="full" />
+          <ScrollCue href="#themes" ground="ink" tone="full" className="hero-cue" />
           <p className="font-mono text-meta uppercase leading-relaxed sm:text-right">
             Independent concept — not affiliated with PKSF
             <span className="mt-1 block">

@@ -210,6 +210,131 @@
   font-weight: 500;
 }
 
+/* ── The two readability zones ────────────────────────────────────────────
+   The statement carries itself on the bare photograph — at that size the
+   charcoal is 13.6:1 on the field's brightest pixel and the halo covers the
+   rest. The 11px mono cannot: measuring the rendered frame rather than the
+   source file, the worst ground the picture puts under the head is
+   rgb(64,74,0) and under the foot rgb(55,43,3), where haloed charcoal is
+   1.7:1 and 1.2:1 unaided.
+
+   So the head and the foot each take a ground of their own, and the middle —
+   the statement, the farmer, the field — is left alone. The two ends are not
+   the same colour, and that is not an oversight:
+
+   The head is cream, at two thirds. It has to be light, because the PKSF
+   lockup sits in it: the mark is green on white artwork, and on a dark band
+   the wordmark under the hexagon simply disappears. Two thirds is the most
+   cream that still reads as haze on the photograph rather than as paper laid
+   over it, and at two thirds the charcoal is 9.3:1 there.
+
+   The foot is a charcoal scrim, the same rgb(16 35 28) the intervention
+   cards use, and its type inverts to cream. Charcoal rather than the deep
+   forest that was tried first: a green ground multiplied into a yellow field
+   turns it olive and takes the red out of the farmer's shawl, while the
+   near-black darkens without moving a hue. The figures end up reading as a
+   printed colophon at the foot of the picture, which is what they are.
+
+   Each zone is a plateau exactly as deep as the type it protects, then a
+   fade into the picture. Both are drawn as children of the block they
+   protect and stretched past it, so the plateau is however deep that block
+   turned out to be at this width — which is why there is no breakpoint here.
+   A tablet, where the legal status wraps onto a third line and the figures
+   stack into two columns, lengthens both plateaus by exactly the height of
+   the type it added.
+
+   The fades are long — 176px at the head, 288px at the foot — and each is
+   drawn with five stops rather than two. A two-stop ramp of this depth shows
+   its own start as a straight line across the field, because the eye finds
+   the discontinuity in the *rate* of change, not in the value; the extra
+   stops bend it into something closer to an ease, and the edge stops being
+   findable. That is also why the foot's fade begins level with the statement
+   and not just above the sentence: over 288px it reads as the light falling
+   off towards the bottom of the frame.
+
+   Measured against the worst pixel each zone can put behind its own ink —
+   the darkest under the head's charcoal, the brightest under the foot's
+   cream — the head is 9.3:1 and the foot 6.0:1. */
+.hero-band-top {
+  background-image: linear-gradient(
+    to bottom,
+    rgb(255 248 232 / 0.72) 0,
+    rgb(255 248 232 / 0.66) calc(100% - 176px),
+    rgb(255 248 232 / 0.52) calc(100% - 140px),
+    rgb(255 248 232 / 0.32) calc(100% - 100px),
+    rgb(255 248 232 / 0.14) calc(100% - 55px),
+    rgb(255 248 232 / 0) 100%
+  );
+}
+
+.hero-band-bottom {
+  background-image: linear-gradient(
+    to top,
+    rgb(16 35 28 / 0.8) 0,
+    rgb(16 35 28 / 0.74) calc(100% - 288px),
+    rgb(16 35 28 / 0.6) calc(100% - 235px),
+    rgb(16 35 28 / 0.42) calc(100% - 180px),
+    rgb(16 35 28 / 0.24) calc(100% - 125px),
+    rgb(16 35 28 / 0.1) calc(100% - 65px),
+    rgb(16 35 28 / 0) 100%
+  );
+}
+
+/* The type inside the foot's zone. It is the inverse of `.on-photo` — cream
+   ink, and a charcoal halo instead of a cream one — because inside the zone
+   the ground is dark and outside it, in the fade, the picture is bright. Set
+   on the block rather than on each line: `color` and `text-shadow` both
+   inherit, and the statement above it is deliberately not given it. */
+.hero-zone-ink {
+  color: #fff8e8;
+  text-shadow:
+    0 0 2px rgb(16 35 28 / 0.92),
+    0 0 2px rgb(16 35 28 / 0.92),
+    0 0 3px rgb(16 35 28 / 0.85),
+    0 0 12px rgb(16 35 28 / 0.7);
+}
+
+/* On a phone the foot is the whole lower half of the frame — the figures
+   stack one to a column and the provenance runs to four lines — so a fade
+   deep enough to be invisible would have to start inside the statement, and
+   the statement is charcoal. There is no room to invert only part of a line
+   of type, so below `sm` the foot takes the head's treatment instead: the
+   same cream, and the ink stays the charcoal it is everywhere else. The
+   transition is shorter to match the space, which is also why it can be —
+   at this width the picture behind the foot is mostly the farmer, and a
+   cream wash over him reads as haze rather than as a band. */
+@media (max-width: 639px) {
+  .hero-band-bottom {
+    background-image: linear-gradient(
+      to top,
+      rgb(255 248 232 / 0.76) 0,
+      rgb(255 248 232 / 0.7) calc(100% - 160px),
+      rgb(255 248 232 / 0.52) calc(100% - 120px),
+      rgb(255 248 232 / 0.32) calc(100% - 78px),
+      rgb(255 248 232 / 0.13) calc(100% - 38px),
+      rgb(255 248 232 / 0) 100%
+    );
+  }
+
+  .hero-zone-ink {
+    color: var(--ink);
+    text-shadow:
+      0 0 2px #fff8e8,
+      0 0 2px #fff8e8,
+      0 0 3px #fff8e8,
+      0 0 10px rgb(255 248 232 / 0.95),
+      0 0 24px rgb(255 248 232 / 0.8);
+  }
+
+  /* The cue's rail is a ground token — cream, for the dark zone — so it has
+     to come back to the dark ink here with the rest of the foot. Scoped to
+     the hero's own cue, not to `ScrollCue` everywhere. */
+  .hero-cue span[aria-hidden="true"] {
+    background-color: rgb(7 59 42 / 0.3);
+  }
+}
+
+
 /* ── Selected-work cards ──────────────────────────────────────────────────
    The ten strategic intervention areas, as a row-based index.
 

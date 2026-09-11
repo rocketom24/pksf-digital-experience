@@ -69,7 +69,12 @@ export function Navbar() {
       // bar instead of the viewport.
       // Transparent over the hero, which is a photograph — so the bar takes
       // the same halo the hero's own type uses (`.on-photo`, globals.css)
-      // rather than a bar of colour laid across the top of the picture.
+      // rather than a bar of colour laid across the top of the picture. It
+      // sits in the plateau of the hero's cream head zone, which the hero
+      // draws and scrolls away with; by then the bar has taken its own
+      // parchment ground. The head zone is light rather than dark for the
+      // sake of the lockup: the mark is green-on-white artwork and its
+      // wordmark vanishes on a dark band.
       data-ground="parchment"
       className={`fixed inset-x-0 top-0 z-40 transition-colors duration-300 motion-reduce:transition-none ${
         light
