@@ -46,7 +46,7 @@ export function MobileMenu({ open, onClose, links }: MobileMenuProps) {
               ref={closeRef}
               type="button"
               onClick={onClose}
-              className="text-sm font-medium uppercase tracking-[0.2em] focus-visible:outline-2 focus-visible:outline-green"
+              className="text-sm font-medium uppercase tracking-[0.2em] focus-visible:outline-2 focus-visible:outline-current"
             >
               Close
             </button>

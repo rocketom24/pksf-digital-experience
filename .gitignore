@@ -42,3 +42,6 @@ next-env.d.ts
 
 # playwright mcp debug artifacts
 .playwright-mcp/
+
+# claude code local state / worktrees — never committed
+.claude/

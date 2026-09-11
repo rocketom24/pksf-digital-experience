@@ -2,13 +2,15 @@ import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { organization } from "@/data/organization";
 
+// Mirrors the Navbar: homepage sections that exist, not routes that don't.
 const links = [
-  { label: "About", href: "/about" },
-  { label: "Our Work", href: "/work" },
-  { label: "Impact", href: "/impact" },
-  { label: "Knowledge", href: "/knowledge" },
-  { label: "Digital", href: "/digital" },
-  { label: "News", href: "/news" },
+  { label: "About", href: "/#statement" },
+  { label: "Our Work", href: "/#interventions" },
+  { label: "Impact", href: "/#impact" },
+  { label: "Knowledge", href: "/#knowledge" },
+  { label: "Digital", href: "/#digital" },
+  { label: "News", href: "/#news" },
+  { label: "Design system", href: "/design-system" },
 ];
 
 export function Footer() {

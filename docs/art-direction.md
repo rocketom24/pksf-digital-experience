@@ -44,7 +44,7 @@ Tailwind tokens defined in [`app/globals.css`](../app/globals.css) via `@theme`.
 |---|---|---|
 | Background | `#F5F4EF` | `bg-background` / `text-background` |
 | Primary dark | `#111312` | `bg-ink` / `text-ink` |
-| Muted | `#6F756F` | `text-muted` |
+| Muted | `#6A706A` | `text-muted` |
 | White | `#FFFFFF` | `bg-white` / `text-white` |
 | Primary PKSF-inspired green | `#1F6B4F` | `bg-green` / `text-green` |
 | Deep green | `#123F31` | `bg-green-deep` |

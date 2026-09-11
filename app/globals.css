@@ -3,7 +3,8 @@
 :root {
   --background: #f5f4ef;
   --ink: #111312;
-  --muted: #6f756f;
+  /* Darkened from #6F756F so 14px body text clears 4.5:1 on --background. */
+  --muted: #6a706a;
   --green: #1f6b4f;
   --green-deep: #123f31;
   --green-soft: #dce9e1;
@@ -36,6 +37,30 @@
   --text-editorial--letter-spacing: -0.015em;
 }
 
+@theme {
+  --animate-cue: cue-travel 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* Hero scroll cue: a hairline that wipes down, then clears from the top. */
+@keyframes cue-travel {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  45% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
@@ -57,7 +82,11 @@ body {
   color: var(--color-background);
 }
 
+/* `currentColor`, not the brand green: green clears 3:1 on the cream ground
+   but only reaches 2.9:1 on --ink and 1.8:1 on --green-deep, so a fixed
+   accent leaves the focus ring failing on every dark section. Taking the
+   element's own text colour guarantees a visible ring on any theme. */
 :focus-visible {
-  outline: 2px solid var(--color-green);
+  outline: 2px solid currentColor;
   outline-offset: 3px;
 }

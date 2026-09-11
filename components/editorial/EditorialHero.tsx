@@ -32,9 +32,11 @@ export function EditorialHero({
 }: EditorialHeroProps) {
   const cls = THEME_CLASSES[theme];
 
+  // `isolate` gives the section its own stacking context, so the `-z-10` media
+  // layer below paints above this section's own background instead of behind it.
   return (
     <section
-      className={`relative flex flex-col overflow-hidden px-4.5 pb-24 pt-32 md:px-12 ${
+      className={`relative isolate flex flex-col overflow-hidden px-4.5 pb-24 pt-32 md:px-12 ${
         fullHeight ? "min-h-screen" : "min-h-[70vh]"
       } ${align === "center" ? "items-center justify-center text-center" : "justify-end"} ${cls.bg} ${cls.text} ${className}`}
     >
@@ -45,7 +47,9 @@ export function EditorialHero({
       )}
 
       {eyebrow && (
-        <SectionLabel className={`mb-8 ${cls.muted}`}>{eyebrow}</SectionLabel>
+        <SectionLabel theme={theme} className="mb-8">
+          {eyebrow}
+        </SectionLabel>
       )}
       <TextReveal
         as="h1"

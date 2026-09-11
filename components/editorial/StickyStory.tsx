@@ -30,7 +30,11 @@ export function StickyStory({ eyebrow, heading, description, items, theme = "lig
   return (
     <div className={`grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16 ${cls.text} ${className}`}>
       <div className="lg:sticky lg:top-32 lg:col-span-4 lg:self-start">
-        {eyebrow && <SectionLabel className={`mb-6 ${cls.muted}`}>{eyebrow}</SectionLabel>}
+        {eyebrow && (
+          <SectionLabel theme={theme} className="mb-6">
+            {eyebrow}
+          </SectionLabel>
+        )}
         <h2 className="font-display text-4xl md:text-5xl">{heading}</h2>
         {description && <p className={`mt-6 max-w-sm text-lg ${cls.muted}`}>{description}</p>}
       </div>

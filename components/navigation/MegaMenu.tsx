@@ -38,7 +38,9 @@ export function MegaMenu({ open }: MegaMenuProps) {
                 }}
               >
                 <Link
-                  href={`/work/${item.slug}`}
+                  // Per-intervention routes don't exist yet; the homepage
+                  // explorer is the real destination for all ten.
+                  href="/#interventions"
                   className="font-display text-xl text-ink/80 transition-colors hover:text-green focus-visible:text-green"
                 >
                   {item.name}

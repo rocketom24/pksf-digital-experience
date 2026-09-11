@@ -21,7 +21,11 @@ export function MediaTextSection({ media, eyebrow, title, description, cta, medi
 
   const textBlock = (
     <div className="mt-10 max-w-2xl">
-      {eyebrow && <SectionLabel className={`mb-6 ${cls.muted}`}>{eyebrow}</SectionLabel>}
+      {eyebrow && (
+        <SectionLabel theme={theme} className="mb-6">
+          {eyebrow}
+        </SectionLabel>
+      )}
       <TextReveal as="h3" text={title} className="font-display text-4xl md:text-5xl" />
       {description && (
         <Reveal delay={0.2} className={`mt-6 text-lg ${cls.muted}`}>

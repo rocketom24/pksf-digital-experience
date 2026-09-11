@@ -20,7 +20,11 @@ export function EditorialStatement({ eyebrow, text, description, align = "start"
 
   return (
     <div className={`${cls.text} ${className}`}>
-      {eyebrow && <SectionLabel className={`mb-6 ${cls.muted} ${alignClass}`}>{eyebrow}</SectionLabel>}
+      {eyebrow && (
+        <SectionLabel theme={theme} className={`mb-6 ${alignClass}`}>
+          {eyebrow}
+        </SectionLabel>
+      )}
       <TextReveal as="h2" text={text} className={`max-w-4xl font-display text-editorial ${alignClass}`} />
       {description && (
         <Reveal delay={0.25} className={`mt-8 max-w-xl text-lg ${cls.muted} ${alignClass}`}>

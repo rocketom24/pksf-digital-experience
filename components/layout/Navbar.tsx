@@ -8,13 +8,17 @@ import { MobileMenu, type NavLink } from "@/components/navigation/MobileMenu";
 import { SearchOverlay } from "@/components/navigation/SearchOverlay";
 import { organization } from "@/data/organization";
 
+// Every entry points at a section that exists. Dedicated routes (/about,
+// /work/<slug>, …) are not built yet, and linking to them 404s and fills the
+// console with failed prefetches — so the nav addresses the homepage instead
+// until those pages are real.
 const links: NavLink[] = [
-  { label: "About", href: "/about" },
-  { label: "Our Work", href: "/work" },
-  { label: "Impact", href: "/impact" },
-  { label: "Knowledge", href: "/knowledge" },
-  { label: "Digital", href: "/digital" },
-  { label: "News", href: "/news" },
+  { label: "About", href: "/#statement" },
+  { label: "Our Work", href: "/#interventions" },
+  { label: "Impact", href: "/#impact" },
+  { label: "Knowledge", href: "/#knowledge" },
+  { label: "Digital", href: "/#digital" },
+  { label: "News", href: "/#news" },
 ];
 
 export function Navbar() {
@@ -90,14 +94,14 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="text-sm font-medium uppercase tracking-[0.2em] transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-green"
+            className="text-sm font-medium uppercase tracking-[0.2em] transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-current"
           >
             Search
           </button>
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
-            className="text-sm font-medium uppercase tracking-[0.2em] transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-green"
+            className="text-sm font-medium uppercase tracking-[0.2em] transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-current"
           >
             Menu
           </button>

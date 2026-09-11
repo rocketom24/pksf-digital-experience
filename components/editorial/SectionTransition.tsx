@@ -12,22 +12,33 @@ type SectionTransitionProps = {
 };
 
 /**
- * Wraps a section in a themed background that wipes in via clip-path as it
- * enters the viewport, creating rhythm between sections (quiet → impact →
- * information → story → quiet) without shifting layout — the background is
- * an absolutely positioned layer behind the content, so content never moves.
+ * Themed section that marks the change of register between sections
+ * (quiet → impact → information → story → quiet).
+ *
+ * The theme background is painted statically on the section. It used to be
+ * a full-height layer that wiped in on `whileInView`, which broke badly: a
+ * target taller than the viewport that goes from "below the viewport" to
+ * "containing the viewport" in a single jump — an anchor link, a fast
+ * scroll — never reports an intersection change, so the wipe never ran and
+ * never recovered, leaving light-on-light text unreadable for the rest of
+ * the session. The transition is now carried by a hairline that draws
+ * across the top edge: if that reveal is ever missed, the cost is one
+ * invisible rule rather than the whole section's content.
  */
 export function SectionTransition({ theme, children, className = "" }: SectionTransitionProps) {
   const reduceMotion = useReducedMotion();
   const cls = THEME_CLASSES[theme];
 
+  // No `overflow-hidden`: it would make this element a scroll container and
+  // silently break `position: sticky` for anything inside (StickyStory).
+  // Nothing needs clipping now that the wipe layer is a top-edge hairline.
   return (
-    <section className={`relative overflow-hidden ${cls.text} ${className}`}>
+    <section className={`relative ${cls.bg} ${cls.text} ${className}`}>
       <motion.div
         aria-hidden="true"
-        className={`absolute inset-0 ${cls.bg}`}
-        initial={{ clipPath: reduceMotion ? "inset(0% 0 0% 0)" : "inset(0% 0 100% 0)" }}
-        whileInView={{ clipPath: "inset(0% 0 0% 0)" }}
+        className="absolute inset-x-0 top-0 h-px origin-left bg-current opacity-20"
+        initial={{ scaleX: reduceMotion ? 1 : 0 }}
+        whileInView={{ scaleX: 1 }}
         viewport={VIEWPORT_ONCE}
         transition={{ duration: reduceMotion ? 0 : DURATION.story, ease: EASE_EDITORIAL }}
       />

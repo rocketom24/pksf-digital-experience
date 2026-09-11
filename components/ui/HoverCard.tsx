@@ -22,7 +22,7 @@ export function HoverCard({ href, title, description, number, image, className =
     <Link
       href={href}
       data-cursor={image ? "image" : undefined}
-      className={`group block border-t border-ink/10 py-8 focus-visible:outline-2 focus-visible:outline-green motion-reduce:**:transition-none! ${className}`}
+      className={`group block border-t border-ink/10 py-8 focus-visible:outline-2 focus-visible:outline-current motion-reduce:**:transition-none! ${className}`}
     >
       {image && (
         <div className="mb-6 overflow-hidden">

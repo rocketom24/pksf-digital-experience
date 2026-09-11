@@ -61,7 +61,7 @@ export default function DesignSystemPage() {
       <PageTransition>
         <main>
           <section className="flex min-h-[70vh] flex-col justify-end bg-ink px-4.5 pb-16 pt-32 text-background md:px-12">
-            <SectionLabel className="mb-8 text-background/60">Phase 2 — internal only, not the homepage</SectionLabel>
+            <SectionLabel theme="dark" className="mb-8">Phase 2 — internal only, not the homepage</SectionLabel>
             <TextReveal
               as="h1"
               text="Design System"
@@ -293,14 +293,14 @@ export default function DesignSystemPage() {
           <div className="flex flex-col">
             <SectionTransition theme="green">
               <Container className="py-20 md:py-28">
-                <SectionLabel className="mb-6 text-background/70">12 — Themes · Green</SectionLabel>
+                <SectionLabel theme="green" className="mb-6">12 — Themes · Green</SectionLabel>
                 <h2 className="font-display text-4xl md:text-5xl">Impact</h2>
-                <p className="mt-4 max-w-md text-background/70">SectionTransition wipes a themed panel in via clip-path — background only, content never shifts.</p>
+                <p className="mt-4 max-w-md text-background/70">SectionTransition paints a themed panel and draws a hairline across its top edge as it enters — background only, content never shifts.</p>
               </Container>
             </SectionTransition>
             <SectionTransition theme="dark">
               <Container className="py-20 md:py-28">
-                <SectionLabel className="mb-6 text-background/60">Dark</SectionLabel>
+                <SectionLabel theme="dark" className="mb-6">Dark</SectionLabel>
                 <h2 className="font-display text-4xl md:text-5xl">Information</h2>
               </Container>
             </SectionTransition>

@@ -10,7 +10,13 @@ type AnimatedNumberProps = {
   suffix?: string;
   duration?: number;
   className?: string;
-  formatter?: (value: number) => string;
+  /**
+   * `grouped` adds thousands separators; `plain` leaves the digits alone,
+   * for values like years. A serializable union rather than a formatter
+   * callback, so Server Components can set it — functions can't cross the
+   * boundary into a Client Component.
+   */
+  format?: "grouped" | "plain";
 };
 
 /** Counts up to `value` once it enters the viewport. */
@@ -20,7 +26,7 @@ export function AnimatedNumber({
   suffix = "",
   duration = 1.6,
   className,
-  formatter = (n) => Math.round(n).toLocaleString("en-US"),
+  format = "grouped",
 }: AnimatedNumberProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-10% 0px" });
@@ -42,7 +48,9 @@ export function AnimatedNumber({
   return (
     <span ref={ref} className={className}>
       {prefix}
-      {formatter(shown)}
+      {format === "plain"
+        ? String(Math.round(shown))
+        : Math.round(shown).toLocaleString("en-US")}
       {suffix}
     </span>
   );

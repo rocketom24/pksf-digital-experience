@@ -87,7 +87,7 @@ export function InteractiveCarousel({ items, ariaLabel, className = "" }: Intera
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
         onKeyDown={handleKeyDown}
-        className="flex cursor-grab snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-[10vw] py-6 focus-visible:outline-2 focus-visible:outline-green active:cursor-grabbing motion-reduce:scroll-auto sm:px-0"
+        className="flex cursor-grab snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-[10vw] py-6 focus-visible:outline-2 focus-visible:outline-current active:cursor-grabbing motion-reduce:scroll-auto sm:px-0"
         style={{ scrollbarWidth: "none" }}
       >
         {items.map((item, i) => (
@@ -115,7 +115,7 @@ export function InteractiveCarousel({ items, ariaLabel, className = "" }: Intera
             onClick={() => scrollToIndex(activeIndex - 1)}
             disabled={activeIndex === 0}
             aria-label="Previous slide"
-            className="rounded-full border border-ink/20 px-4 py-2 text-sm transition-colors hover:border-ink disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-green"
+            className="rounded-full border border-ink/20 px-4 py-2 text-sm transition-colors hover:border-ink disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-current"
           >
             ←
           </button>
@@ -124,7 +124,7 @@ export function InteractiveCarousel({ items, ariaLabel, className = "" }: Intera
             onClick={() => scrollToIndex(activeIndex + 1)}
             disabled={activeIndex === items.length - 1}
             aria-label="Next slide"
-            className="rounded-full border border-ink/20 px-4 py-2 text-sm transition-colors hover:border-ink disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-green"
+            className="rounded-full border border-ink/20 px-4 py-2 text-sm transition-colors hover:border-ink disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-current"
           >
             →
           </button>
