@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import { interventions, type Intervention } from "@/data/interventions";
+import { interventionMedia } from "@/data/interventionMedia";
 import { Frame } from "@/components/editorial/Frame";
 import { GROUND_VARS, type Ground } from "@/components/editorial/grounds";
 import { DURATION, EASE_EDITORIAL } from "@/components/motion/tokens";
@@ -17,25 +18,15 @@ type StrategicExplorerProps = {
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 
 /**
- * Each intervention gets its own ground, so moving through the ten is a
- * journey across the palette rather than ten states of one panel. The
- * assignment groups the areas loosely by register — the economic ones on
- * forest, the land ones on moss, the human ones on ink, digital on paper —
- * which gives the sequence a rhythm instead of a cycle. It is a visual
- * grouping only and is never presented as a published taxonomy.
+ * Ground and plate come from `data/interventionMedia.ts`, which is the one
+ * place intervention presentation is decided — the homepage sequence reads
+ * the same map, so the two can never drift apart.
  */
-const GROUNDS: Ground[] = [
-  "forest", // Inclusive Finance
-  "moss", // Climate Action
-  "forest", // Microenterprise Development
-  "ink", // Extreme Poverty
-  "ink", // Human Capacity
-  "paper", // Digital Transformation
-  "moss", // Agricultural Development
-  "forest", // Strategic Alliances
-  "moss", // Building Resilience
-  "ink", // Knowledge, Communication & Advocacy
-];
+const groundFor = (item: Intervention): Ground =>
+  interventionMedia[item.slug]?.ground ?? "forest";
+
+const plateFor = (item: Intervention, i: number): PlateVariant =>
+  interventionMedia[item.slug]?.plate ?? PLATES[i % PLATES.length];
 
 const PLATES: PlateVariant[] = ["delta", "strata", "weave"];
 
@@ -114,7 +105,7 @@ export function StrategicExplorer({ items = interventions, className = "" }: Str
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const active = items[activeIndex];
-  const ground = GROUNDS[activeIndex % GROUNDS.length];
+  const ground = groundFor(active);
   const vars = GROUND_VARS[ground];
 
   function handleTabKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
@@ -214,7 +205,7 @@ export function StrategicExplorer({ items = interventions, className = "" }: Str
                           open row put together. */}
                       <Frame
                         ratio="wide"
-                        plate={PLATES[i % PLATES.length]}
+                        plate={plateFor(item, i)}
                         ground={ground}
                         className="mb-6"
                       />
@@ -333,7 +324,7 @@ export function StrategicExplorer({ items = interventions, className = "" }: Str
 
               <Frame
                 ratio="wide"
-                plate={PLATES[activeIndex % PLATES.length]}
+                plate={plateFor(active, activeIndex)}
                 treatment="crop"
                 ground={ground}
                 className="mt-12"

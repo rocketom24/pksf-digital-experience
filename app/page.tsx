@@ -6,7 +6,6 @@ import { Ground } from "@/components/editorial/Ground";
 import { IndexRow } from "@/components/editorial/IndexRow";
 import { Meta, SectionHead } from "@/components/editorial/SectionHead";
 import { StatementSequence, type StatementWord } from "@/components/editorial/StatementSequence";
-import { StrategicExplorer } from "@/components/editorial/StrategicExplorer";
 import { DeltaRelay } from "@/components/home/DeltaRelay";
 import { DigitalDirection } from "@/components/home/DigitalDirection";
 import { DigitalTimeline } from "@/components/home/DigitalTimeline";
@@ -14,6 +13,7 @@ import { Hero } from "@/components/home/Hero";
 import { HumanStory } from "@/components/home/HumanStory";
 import { ImpactLedger } from "@/components/home/ImpactLedger";
 import { ProvenanceMark } from "@/components/home/ProvenanceMark";
+import { StrategicInterventions } from "@/components/home/StrategicInterventions";
 import { Reveal } from "@/components/motion/Reveal";
 import { Button } from "@/components/ui/Button";
 import { CustomCursor } from "@/components/ui/CustomCursor";
@@ -77,6 +77,13 @@ export default function Home() {
           />
         </Ground>
 
+        {/* ── Strategic interventions ──────────────────────────────────────
+            Third, directly after the objectives. The objectives say what the
+            plan is for; the ten areas are where it is actually carried out,
+            and a reader who has just been handed three abstractions should
+            meet the concrete work next rather than three sections later. */}
+        <StrategicInterventions />
+
         {/* ── Full-screen visual ───────────────────────────────────────── */}
         <Ground ground="forest">
           <div className="relative flex min-h-[88svh] flex-col justify-end pb-24 md:pb-32">
@@ -107,7 +114,7 @@ export default function Home() {
         </Ground>
 
         {/* ── The model ────────────────────────────────────────────────── */}
-        <Ground ground="parchment" id="model" marker="02">
+        <Ground ground="parchment" id="model" marker="03">
           <Container className={RHYTHM}>
             <SectionHead
               label="The model"
@@ -137,7 +144,7 @@ export default function Home() {
         </Ground>
 
         {/* ── The ledger ───────────────────────────────────────────────── */}
-        <Ground ground="ink" id="ledger" marker="03">
+        <Ground ground="ink" id="ledger" marker="04">
           <Container className={RHYTHM}>
             <SectionHead
               label="The ledger"
@@ -155,27 +162,6 @@ export default function Home() {
             <ImpactLedger ground="ink" className="mt-20 lg:mt-28" />
           </Container>
         </Ground>
-
-        {/* ── Strategic interventions ──────────────────────────────────── */}
-        <Ground ground="parchment" marker="04">
-          <Container className="pb-16 pt-24 md:pt-32 lg:pt-40">
-            <SectionHead
-              label="Strategic interventions"
-              heading={`${interventions.length} areas, one mandate.`}
-              note="The published set, in full. Choose one to read what it covers."
-              aside={
-                <ProvenanceMark
-                  kind="verified"
-                  note="names and figures as published; the descriptions are shortened, not rewritten"
-                />
-              }
-            />
-          </Container>
-        </Ground>
-        {/* The explorer owns its own ground, which changes with the selection. */}
-        <section id="interventions" className="scroll-mt-16">
-          <StrategicExplorer />
-        </section>
 
         {/* ── Human story ──────────────────────────────────────────────── */}
         <Ground ground="moss" id="story" marker="05">

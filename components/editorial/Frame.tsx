@@ -28,6 +28,13 @@ type FrameProps = {
    * gradient at the foot so type can sit over the media and stay legible.
    */
   treatment?: "plain" | "crop" | "fade";
+  /**
+   * Opens the frame from a masked state as it enters, rather than having it
+   * arrive whole. Driven by the same scroll progress as `crop`, so the two
+   * read as one movement — the picture grows into its frame while the frame
+   * grows into the page.
+   */
+  mask?: boolean;
   /** Ground the frame sits on — drives the plate tone and the fade colour. */
   ground?: Ground;
   /** Rendered over the media, bottom-aligned. */
@@ -55,6 +62,7 @@ export function Frame({
   plate = "delta",
   ratio = "wide",
   treatment = "plain",
+  mask = false,
   ground = "parchment",
   overlay,
   caption,
@@ -65,16 +73,32 @@ export function Frame({
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const scale = useTransform(scrollYProgress, [0, 1], [1.12, 1], { clamp: true });
+  /**
+   * The mask. Scroll-linked rather than `whileInView`, for the same reason
+   * the crop is: a frame taller than the viewport can go from "below" to
+   * "containing" in one jump — an anchor link does exactly that — and an
+   * intersection observer never reports it, which would leave the picture
+   * masked shut for the rest of the session.
+   *
+   * The input range spans the full [0, 1] and holds its end value, so the
+   * transform is never handed a position outside its own domain.
+   */
+  const clipPath = useTransform(
+    scrollYProgress,
+    [0, 0.32, 1],
+    ["inset(0% 0% 100% 0%)", "inset(0% 0% 0% 0%)", "inset(0% 0% 0% 0%)"]
+  );
 
   const cropping = treatment === "crop";
 
   return (
     <figure className={`m-0 ${className}`}>
-      <div
+      <motion.div
         ref={ref}
-        className={`relative isolate w-full overflow-hidden ${RATIO[ratio]} ${
-          g.dark ? "bg-on-dark/6" : "bg-on-light/5"
-        }`}
+        className={`relative isolate w-full overflow-hidden ${mask ? "frame-mask" : ""} ${
+          RATIO[ratio]
+        } ${g.dark ? "bg-on-dark/6" : "bg-on-light/5"}`}
+        style={mask ? { clipPath } : undefined}
       >
         <motion.div
           className={`absolute inset-0 ${cropping ? "frame-crop" : ""} ${g.plate}`}
@@ -93,7 +117,7 @@ export function Frame({
         )}
 
         {overlay && <div className="absolute inset-x-0 bottom-0 p-6 md:p-10">{overlay}</div>}
-      </div>
+      </motion.div>
 
       {caption && (
         <figcaption className="mt-4">

@@ -210,6 +210,98 @@
   font-weight: 500;
 }
 
+/* ── Selected-work cards ──────────────────────────────────────────────────
+   The ten strategic intervention areas, as a row-based index.
+
+   Below `md` the cards stack one to a row and everything on them is painted:
+   there is no pointer that can hover, so nothing is allowed to depend on
+   hovering. From `md` up they sit three to a row at one fixed height, and the
+   row redistributes its width under the pointer — the card being looked at
+   takes half the row and its two neighbours give up a quarter each.
+
+   The width is `flex-basis`, not `flex-grow`. A full row has no free space
+   left for grow to distribute, so growing a card there does nothing at all.
+
+   The gap is 0.375rem, and the basis arithmetic has to account for it or the
+   row overflows the moment it is hovered. */
+.si-scrim {
+  /* Charcoal, on every card regardless of the plate's own ground. The type on
+     a card is always `--on-dark` against this, which is the only way to get
+     one measurable pairing across ten plates and, later, ten photographs:
+     cream on the foot of this gradient is 13.9:1.
+     It arrives with the type rather than sitting on the card permanently —
+     an untouched card is the picture and nothing else. */
+  background: linear-gradient(
+    to top,
+    rgb(16 35 28 / 0.92) 0%,
+    rgb(16 35 28 / 0.74) 30%,
+    rgb(16 35 28 / 0.3) 62%,
+    rgb(16 35 28 / 0) 100%
+  );
+}
+
+@media (min-width: 768px) {
+  .si-row {
+    height: clamp(15rem, 27vw, 25rem);
+  }
+
+  .si-card {
+    flex: 0 1 calc((100% - 2 * 0.375rem) / 3);
+  }
+
+  /* The tenth area closes the sequence on its own full-width row. */
+  .si-row-single .si-card {
+    flex-basis: 100%;
+  }
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .si-card {
+    transition: flex-basis 620ms var(--ease-editorial);
+  }
+
+  .si-row:not(.si-row-single):hover .si-card,
+  .si-row:not(.si-row-single):focus-within .si-card {
+    flex-basis: calc((100% - 2 * 0.375rem) / 4);
+  }
+
+  /* Written after the rule above, and at the same specificity, so the card
+     under the pointer — or under the keyboard — wins its own row. */
+  .si-row:not(.si-row-single):hover .si-card:hover,
+  .si-row:not(.si-row-single):focus-within .si-card:focus-within {
+    flex-basis: calc((100% - 2 * 0.375rem) / 2);
+  }
+}
+
+/* What a card says: its number, its name, and its one published figure.
+   Revealed under the pointer where there is a pointer that can hover — an
+   untouched card is the picture alone — and painted unconditionally where
+   there is not, so a touch reader never loses it. A card is focusable for
+   the same reason: a keyboard reader has no pointer to reveal it with. The
+   text is in the document either way, so a screen reader is never affected
+   by any of this. */
+@media (hover: hover) and (pointer: fine) {
+  .si-detail {
+    opacity: 0;
+    transition: opacity 420ms var(--ease-editorial);
+  }
+
+  .si-detail-body {
+    transform: translateY(0.9rem);
+    transition: transform 520ms var(--ease-editorial);
+  }
+
+  .si-card:hover .si-detail,
+  .si-card:focus-within .si-detail {
+    opacity: 1;
+  }
+
+  .si-card:hover .si-detail-body,
+  .si-card:focus-within .si-detail-body {
+    transform: none;
+  }
+}
+
 /* A section whose ground changes under user control interpolates background
    and text together, so no frame of the transition is light on light. */
 .ground-shift {
@@ -241,9 +333,24 @@
 
   /* `reducedMotion: "user"` only skips transforms, and the hero's reveal is
      a clip-path — so it has to be cancelled here, the same way, rather than
-     by rendering a different tree. The photograph arrives whole. */
-  .hero-mask {
+     by rendering a different tree. The photograph arrives whole. The frames
+     in the intervention sequence open the same way and are cancelled the
+     same way. */
+  .hero-mask,
+  .frame-mask {
     clip-path: none !important;
+  }
+
+  /* The cards still redistribute their width under the pointer — that is the
+     layout answering a question, not decoration — but they do it at once. */
+  .si-card,
+  .si-detail,
+  .si-detail-body {
+    transition: none !important;
+  }
+
+  .si-detail-body {
+    transform: none !important;
   }
 }
 
