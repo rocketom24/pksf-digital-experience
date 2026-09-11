@@ -1,0 +1,92 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Container } from "@/components/layout/Container";
+import { MegaMenu } from "@/components/navigation/MegaMenu";
+import { MobileMenu, type NavLink } from "@/components/navigation/MobileMenu";
+import { SearchOverlay } from "@/components/navigation/SearchOverlay";
+import { organization } from "@/data/organization";
+
+const links: NavLink[] = [
+  { label: "About", href: "/about" },
+  { label: "Our Work", href: "/work" },
+  { label: "Impact", href: "/impact" },
+  { label: "Knowledge", href: "/knowledge" },
+  { label: "Digital", href: "/digital" },
+  { label: "News", href: "/news" },
+];
+
+export function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [workOpen, setWorkOpen] = useState(false);
+
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 32);
+    }
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const solid = scrolled || menuOpen || searchOpen;
+
+  return (
+    <header
+      className={`fixed inset-x-0 top-0 z-40 transition-colors duration-300 ${
+        solid ? "bg-background/95 text-ink shadow-sm backdrop-blur-sm" : "bg-transparent text-white"
+      }`}
+    >
+      <Container className="relative flex h-20 items-center justify-between">
+        <Link href="/" className="font-display text-2xl tracking-tight">
+          {organization.shortName}
+        </Link>
+
+        <nav aria-label="Primary" className="hidden items-center gap-8 lg:flex">
+          {links.map((link) =>
+            link.label === "Our Work" ? (
+              <div
+                key={link.href}
+                onMouseEnter={() => setWorkOpen(true)}
+                onMouseLeave={() => setWorkOpen(false)}
+                className="relative"
+              >
+                <Link href={link.href} className="text-sm font-medium transition-opacity hover:opacity-70">
+                  {link.label}
+                </Link>
+                <MegaMenu open={workOpen} />
+              </div>
+            ) : (
+              <Link key={link.href} href={link.href} className="text-sm font-medium transition-opacity hover:opacity-70">
+                {link.label}
+              </Link>
+            )
+          )}
+        </nav>
+
+        <div className="flex items-center gap-6">
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            className="text-sm font-medium uppercase tracking-[0.2em] transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-green"
+          >
+            Search
+          </button>
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            className="text-sm font-medium uppercase tracking-[0.2em] transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-green"
+          >
+            Menu
+          </button>
+        </div>
+      </Container>
+
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} links={links} />
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+    </header>
+  );
+}

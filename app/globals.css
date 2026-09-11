@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f4ef;
+  --ink: #111312;
+  --muted: #6f756f;
+  --green: #1f6b4f;
+  --green-deep: #123f31;
+  --green-soft: #dce9e1;
+  --sand: #d9c8a4;
+  --clay: #9b7653;
+  --sky: #b7ccd0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-green: var(--green);
+  --color-green-deep: var(--green-deep);
+  --color-green-soft: var(--green-soft);
+  --color-sand: var(--sand);
+  --color-clay: var(--clay);
+  --color-sky: var(--sky);
+
+  --font-display: var(--font-instrument-serif);
+  --font-sans: var(--font-manrope);
+
+  /* Editorial type scale — see docs/art-direction.md */
+  --text-hero: clamp(4rem, 9vw, 9rem);
+  --text-hero--line-height: 0.95;
+  --text-hero--letter-spacing: -0.02em;
+
+  --text-editorial: clamp(3rem, 7vw, 7rem);
+  --text-editorial--line-height: 1;
+  --text-editorial--letter-spacing: -0.015em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+html {
+  background: var(--color-background);
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-green);
+  color: var(--color-background);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-green);
+  outline-offset: 3px;
+}
