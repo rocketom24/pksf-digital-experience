@@ -95,6 +95,11 @@
   --font-prose: var(--font-newsreader);
   --font-mono: var(--font-plex-mono);
   --font-sans: var(--font-bricolage);
+  /* The three faces above carry no Bengali script at all. Bangla set in them
+     falls back to whatever the device happens to have, which is a fourth
+     voice nobody chose — so it has a face of its own, and a serif, to keep it
+     in the same register as the prose. */
+  --font-bangla: var(--font-tiro-bangla), var(--font-newsreader), serif;
 
   /* Statement type. One word can hold the viewport at `colossal`.
      `colossal` is sized for short words — Reach, Others, PKSF. `statement`
@@ -452,7 +457,11 @@
   }
 
   .frame-crop,
-  .hero-crop {
+  .hero-crop,
+  /* The featured video's pointer drift, for the same reason and by the same
+     mechanism: a spring-driven MotionValue in the inline style cannot be
+     switched off by rendering a different tree without a hydration mismatch. */
+  .pointer-parallax {
     transform: none !important;
   }
 

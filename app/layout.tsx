@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, IBM_Plex_Mono, Newsreader } from "next/font/google";
+import { Bricolage_Grotesque, IBM_Plex_Mono, Newsreader, Tiro_Bangla } from "next/font/google";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import "./globals.css";
 
@@ -19,6 +19,12 @@ import "./globals.css";
  * years, indices, counts, provenance labels. The digital timeline on this
  * page runs from paper ledgers to data intelligence; the mono is that
  * lineage, not decoration.
+ *
+ * `Tiro Bangla` sets the Bangla. None of the three faces above carries the
+ * Bengali script at all, so Bangla in them falls back to whatever the device
+ * has and arrives in a fourth, unchosen voice. Tiro Bangla is a text serif,
+ * which puts the Bangla in the same register as the prose rather than in the
+ * display grotesque — it is the reading voice, and it is set that way.
  */
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
@@ -42,6 +48,13 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
+const tiroBangla = Tiro_Bangla({
+  variable: "--font-tiro-bangla",
+  subsets: ["bengali"],
+  weight: "400",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: {
     default: "PKSF Digital Experience — An Independent Concept",
@@ -55,7 +68,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${bricolage.variable} ${newsreader.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${bricolage.variable} ${newsreader.variable} ${plexMono.variable} ${tiroBangla.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-parchment text-on-light">
         <MotionProvider>{children}</MotionProvider>

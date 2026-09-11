@@ -1,7 +1,6 @@
 import { Container } from "@/components/layout/Container";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
-import { Frame } from "@/components/editorial/Frame";
 import { Ground } from "@/components/editorial/Ground";
 import { IndexRow } from "@/components/editorial/IndexRow";
 import { Meta, SectionHead } from "@/components/editorial/SectionHead";
@@ -15,6 +14,7 @@ import { ImpactLedger } from "@/components/home/ImpactLedger";
 import { Projects } from "@/components/home/Projects";
 import { ProvenanceMark } from "@/components/home/ProvenanceMark";
 import { StrategicInterventions } from "@/components/home/StrategicInterventions";
+import { Watch } from "@/components/home/Watch";
 import { Reveal } from "@/components/motion/Reveal";
 import { Button } from "@/components/ui/Button";
 import { CustomCursor } from "@/components/ui/CustomCursor";
@@ -91,34 +91,17 @@ export default function Home() {
             three sections between them. */}
         <Projects />
 
-        {/* ── Full-screen visual ───────────────────────────────────────── */}
-        <Ground ground="forest">
-          <div className="relative flex min-h-[88svh] flex-col justify-end pb-24 md:pb-32">
-            <Frame
-              ratio="bleed"
-              plate="delta"
-              ground="forest"
-              className="absolute inset-0 -z-10 [&>div]:h-full"
-            />
-            <Container>
-              <Meta ground="forest">The vision, in PKSF&rsquo;s own words</Meta>
-              <Reveal className="mt-8">
-                {/* Set past the measure on purpose: the line runs off the
-                    right edge the way the network runs past the centre. The
-                    section clips on x, so it never produces a scrollbar. */}
-                <p className="max-w-[16ch] font-display text-display font-bold uppercase md:max-w-[24ch]">
-                  {organization.vision}
-                </p>
-              </Reveal>
-              <ProvenanceMark
-                kind="verified"
-                ground="forest"
-                note="PKSF — Our Vision, verbatim"
-                className="mt-8"
-              />
-            </Container>
-          </div>
-        </Ground>
+        {/* ── Watch ────────────────────────────────────────────────────────
+            Directly after the projects, and deliberately not numbered: the
+            markers 01–08 are the sequence the navigation addresses, and this
+            section is PKSF speaking in its own voice rather than another
+            chapter of the page's argument. */}
+        <Watch />
+
+        {/* The full-screen vision panel that used to sit here was removed on
+            request. PKSF's vision statement is no longer set anywhere on this
+            page; `organization.vision` is still in the data and is what a
+            replacement would read from. */}
 
         {/* ── The model ────────────────────────────────────────────────── */}
         <Ground ground="parchment" id="model" marker="04">
