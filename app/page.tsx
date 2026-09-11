@@ -12,6 +12,7 @@ import { DigitalTimeline } from "@/components/home/DigitalTimeline";
 import { Hero } from "@/components/home/Hero";
 import { HumanStory } from "@/components/home/HumanStory";
 import { ImpactLedger } from "@/components/home/ImpactLedger";
+import { Projects } from "@/components/home/Projects";
 import { ProvenanceMark } from "@/components/home/ProvenanceMark";
 import { StrategicInterventions } from "@/components/home/StrategicInterventions";
 import { Reveal } from "@/components/motion/Reveal";
@@ -22,7 +23,6 @@ import { interventions } from "@/data/interventions";
 import { news } from "@/data/news";
 import { organization, strategicPlan } from "@/data/organization";
 import { programs } from "@/data/programs";
-import { projects } from "@/data/projects";
 import { publications } from "@/data/publications";
 
 /** Shared vertical rhythm for the storytelling sections. */
@@ -84,6 +84,13 @@ export default function Home() {
             meet the concrete work next rather than three sections later. */}
         <StrategicInterventions />
 
+        {/* ── Projects ─────────────────────────────────────────────────────
+            Fourth, immediately after the ten areas. The areas are the
+            framework; these are the financed, time-bound initiatives running
+            inside it, so the two belong next to each other rather than with
+            three sections between them. */}
+        <Projects />
+
         {/* ── Full-screen visual ───────────────────────────────────────── */}
         <Ground ground="forest">
           <div className="relative flex min-h-[88svh] flex-col justify-end pb-24 md:pb-32">
@@ -114,7 +121,7 @@ export default function Home() {
         </Ground>
 
         {/* ── The model ────────────────────────────────────────────────── */}
-        <Ground ground="parchment" id="model" marker="03">
+        <Ground ground="parchment" id="model" marker="04">
           <Container className={RHYTHM}>
             <SectionHead
               label="The model"
@@ -144,7 +151,7 @@ export default function Home() {
         </Ground>
 
         {/* ── The ledger ───────────────────────────────────────────────── */}
-        <Ground ground="ink" id="ledger" marker="04">
+        <Ground ground="ink" id="ledger" marker="05">
           <Container className={RHYTHM}>
             <SectionHead
               label="The ledger"
@@ -164,14 +171,14 @@ export default function Home() {
         </Ground>
 
         {/* ── Human story ──────────────────────────────────────────────── */}
-        <Ground ground="moss" id="story" marker="05">
+        <Ground ground="moss" id="story" marker="06">
           <Container className={RHYTHM}>
             <HumanStory ground="moss" />
           </Container>
         </Ground>
 
         {/* ── Digital transformation ───────────────────────────────────── */}
-        <Ground ground="ink" id="digital" marker="06">
+        <Ground ground="ink" id="digital" marker="07">
           <Container className="pt-24 md:pt-32 lg:pt-40">
             <SectionHead
               label="Digital transformation"
@@ -198,16 +205,16 @@ export default function Home() {
         </Ground>
 
         {/* ── The desk ─────────────────────────────────────────────────── */}
-        <Ground ground="parchment" id="desk" marker="07">
+        <Ground ground="parchment" id="desk" marker="08">
           <Container className={RHYTHM}>
             <SectionHead
               label="The desk"
-              heading="The instruments, and what they are currently funding."
-              note="Programmes are PKSF's standing instruments. Projects are time-bound and co-financed."
+              heading="The instruments, and what they are published against."
+              note="Programmes are PKSF's standing instruments. The projects running inside them are a section of their own, above."
               aside={
                 <ProvenanceMark
                   kind="verified"
-                  note="PKSF — Programs, Projects, Annual Reports and News Center"
+                  note="PKSF — Programs, Annual Reports and News Center"
                 />
               }
             />
@@ -242,51 +249,15 @@ export default function Home() {
               </div>
             </div>
 
-            {/* ── Projects ─────────────────────────────────────────────── */}
-            <div id="projects" className="mt-24 scroll-mt-28 lg:mt-32">
-              <h3>
-                <Meta>02 — Projects</Meta>
-              </h3>
-              <p className="mt-6 max-w-xl text-lead text-muted">
-                Time-bound and co-financed. Status, duration and partners are
-                as PKSF publishes them — never inferred from the dates.
-              </p>
-
-              <div className="mt-12 border-b border-on-light/14">
-                {projects.map((project, i) => (
-                  <IndexRow
-                    key={project.slug}
-                    index={pad(i)}
-                    title={project.name}
-                    kicker={project.fullName}
-                    meta={[
-                      {
-                        label: "Status",
-                        value: project.status === "ongoing" ? "Ongoing" : "Completed",
-                      },
-                      ...(project.duration
-                        ? [{ label: "Duration", value: project.duration }]
-                        : []),
-                      ...(project.budget ? [{ label: "Financing", value: project.budget }] : []),
-                      ...(project.partners
-                        ? [{ label: "Partners", value: project.partners.join(", ") }]
-                        : []),
-                      ...(project.targetGroup
-                        ? [{ label: "Target group", value: project.targetGroup }]
-                        : []),
-                    ]}
-                    footer={<ProvenanceMark kind="verified" note={project.source} />}
-                  >
-                    {project.summary}
-                  </IndexRow>
-                ))}
-              </div>
-            </div>
+            {/* The projects used to be indexed here as well. They are now a
+                section of their own, directly after the intervention areas —
+                the same eleven entries listed twice on one page was one list
+                too many, and `#projects` can only address one of them. */}
 
             {/* ── Knowledge ────────────────────────────────────────────── */}
             <div id="knowledge" className="mt-24 scroll-mt-28 lg:mt-32">
               <h3>
-                <Meta>03 — Knowledge</Meta>
+                <Meta>02 — Knowledge</Meta>
               </h3>
               <p className="mt-6 max-w-xl text-lead text-muted">
                 What an apex institution publishes, and is judged on. Links go
@@ -315,7 +286,7 @@ export default function Home() {
             {/* ── News ─────────────────────────────────────────────────── */}
             <div id="news" className="mt-24 scroll-mt-28 lg:mt-32">
               <h3>
-                <Meta>04 — News</Meta>
+                <Meta>03 — News</Meta>
               </h3>
               <p className="mt-6 max-w-xl text-lead text-muted">
                 A short, dated selection issued by PKSF. Newest first.
