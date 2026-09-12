@@ -309,7 +309,9 @@ export function Footer() {
 
           The columns are in document order at every width, so the tab order a
           keyboard reader gets is the order a sighted reader sees. */}
-      <Container className="mt-20 md:mt-24">
+      {/* `#contact` — the navigation's Contact word addresses this row. The
+          footer already was the contact register; it simply had no id. */}
+      <Container id="contact" className="mt-20 scroll-mt-28 md:mt-24">
         <div className="grid gap-x-8 gap-y-14 md:grid-cols-12 lg:gap-x-16">
           <div className="md:col-span-6 lg:col-span-4">
             <FooterLabel en="Head office" bn={BN.headOffice} />

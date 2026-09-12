@@ -1,33 +1,53 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { PRIMARY_LINKS, SECTION_IDS, SECTION_OWNER } from "@/components/navigation/links";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { MegaMenu } from "@/components/navigation/MegaMenu";
+import { PRIMARY_NAV, SECTION_IDS, SECTION_OWNER } from "@/components/navigation/links";
+import { SearchOverlay } from "@/components/navigation/SearchOverlay";
 import { SiteMenu } from "@/components/navigation/SiteMenu";
+import { Magnetic } from "@/components/motion/Magnetic";
+import { DURATION, EASE_EDITORIAL } from "@/components/motion/tokens";
+import { SearchMark } from "@/components/ui/Marks";
 import { organization } from "@/data/organization";
 
+/** How long the panel survives the pointer leaving it. Short enough not to
+ *  hang around, long enough to cross the gap between a word and its panel. */
+const CLOSE_DELAY = 160;
+
+const panelId = (href: string) => `nav-panel-${href.replace(/\W+/g, "-")}`;
+
 /**
- * The bar carries three things: who this is, roughly where you are, and the
- * way in.
+ * The bar carries six words, a way to search, and the way in.
  *
- * Four words and a wordmark, set at metadata size with no boxes, no rules and
- * no icons. It is meant to be almost invisible until you look for it — over
- * the hero photograph it is transparent and sits in the plateau of the hero's
- * top scrim, so it stays legible without a bar of its own; once the page has
- * scrolled it takes the parchment ground and a hairline.
+ * The words are real destinations now rather than a coarse index: four of them
+ * open a panel that addresses the sections under them directly, so nothing on
+ * this page is more than two moves from the top of the screen. It is still
+ * almost invisible until you look for it — no boxes, no rules, metadata size —
+ * and over the hero photograph it is transparent and sits in the plateau of the
+ * hero's top scrim. Once the page has scrolled, or anything is open, it takes
+ * the parchment ground and a hairline.
  *
- * The four words are a coarse index, not a second navigation: each owns a run
- * of sections, so the readout keeps reporting a position all the way down the
- * page instead of going blank between anchors. Everything else lives in the
- * overlay. The marking is supplementary — the same sections are reachable
- * from the overlay and from the page itself — so nothing breaks if the
- * observer is unsupported.
+ * One marker slides between the words: it rests under whichever section the
+ * reader is in and travels to whatever the pointer is over, returning when the
+ * pointer leaves. That is the whole hover state — there is no dimming of the
+ * inactive words, because over the hero the bar floats on a graded photograph
+ * where the mono is 5.07:1 at full ink and under it at any reduced opacity.
+ *
+ * Below `lg` the words are hidden rather than compressed: six of them will not
+ * fit beside a wordmark on an 834px measure, and the overlay is the same
+ * navigation with the panels opened out as groups.
  */
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [openHref, setOpenHref] = useState<string | null>(null);
+  const [hoveredHref, setHoveredHref] = useState<string | null>(null);
   const [current, setCurrent] = useState<string | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -59,22 +79,66 @@ export function Navbar() {
     return () => observer.disconnect();
   }, []);
 
+  const cancelClose = useCallback(() => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = null;
+  }, []);
+
+  const closePanel = useCallback(() => {
+    cancelClose();
+    setOpenHref(null);
+    setHoveredHref(null);
+  }, [cancelClose]);
+
+  const scheduleClose = useCallback(() => {
+    cancelClose();
+    closeTimer.current = setTimeout(() => {
+      setOpenHref(null);
+      setHoveredHref(null);
+    }, CLOSE_DELAY);
+  }, [cancelClose]);
+
+  useEffect(() => cancelClose, [cancelClose]);
+
+  // Escape closes the panel; ⌘K / Ctrl-K and `/` open search, but never while
+  // the visitor is typing into something — `/` is a character before it is a
+  // shortcut.
+  useEffect(() => {
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === "Escape") closePanel();
+
+      const target = event.target as HTMLElement | null;
+      const typing =
+        target?.isContentEditable ||
+        ["INPUT", "TEXTAREA", "SELECT"].includes(target?.tagName ?? "");
+
+      const shortcut =
+        (event.key === "k" && (event.metaKey || event.ctrlKey)) ||
+        (event.key === "/" && !typing && !event.metaKey && !event.ctrlKey);
+
+      if (!shortcut) return;
+      event.preventDefault();
+      closePanel();
+      setMenuOpen(false);
+      setSearchOpen(true);
+    }
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [closePanel]);
+
   const activeHref = current ? SECTION_OWNER[current] : undefined;
-  const light = scrolled || menuOpen;
+  // What the sliding marker sits under: the pointer wins over the open panel,
+  // and the open panel wins over where the reader actually is.
+  const markedHref = hoveredHref ?? openHref ?? activeHref;
+  const open = PRIMARY_NAV.find((item) => item.href === openHref && item.children?.length);
+  const light = scrolled || menuOpen || searchOpen || Boolean(open);
 
   return (
     <header
       // No `backdrop-filter`: a filter on this fixed ancestor would create a
-      // containing block for the fixed overlay below, trapping it inside the
-      // bar instead of the viewport.
-      // Transparent over the hero, which is a photograph — so the bar takes
-      // the same halo the hero's own type uses (`.on-photo`, globals.css)
-      // rather than a bar of colour laid across the top of the picture. It
-      // sits in the plateau of the hero's cream head zone, which the hero
-      // draws and scrolls away with; by then the bar has taken its own
-      // parchment ground. The head zone is light rather than dark for the
-      // sake of the lockup: the mark is green-on-white artwork and its
-      // wordmark vanishes on a dark band.
+      // containing block for the fixed overlays below, trapping them inside
+      // the bar instead of the viewport.
       data-ground="parchment"
       className={`fixed inset-x-0 top-0 z-40 transition-colors duration-300 motion-reduce:transition-none ${
         light
@@ -82,81 +146,153 @@ export function Navbar() {
           : "on-photo border-b border-transparent bg-transparent"
       }`}
     >
-      <div className="mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between gap-8 px-4.5 md:px-12">
-        <div className="flex items-center gap-10 lg:gap-14">
-          <Link
-            href="/"
-            data-cursor="nav"
-            aria-label={`${organization.shortName} — ${organization.fullName}`}
-            className="flex items-center"
-          >
-            {/* PKSF's own lockup, rendered as artwork rather than recoloured.
-                An earlier version masked it with `currentColor` to get a
-                reverse of it, which silently destroyed it: the hexagon's
-                interior is opaque white in the source file, not transparent,
-                so the mask filled the whole shape and it came out a solid
-                blob. The mark is green on white by design and reads on both
-                grounds the bar uses — the sunlit field and the parchment —
-                so it is simply drawn as it is. */}
-            <Image
-              src="/images/brand/pksf-logo.png"
-              alt=""
-              aria-hidden="true"
-              width={320}
-              height={439}
-              priority
-              className="h-14 w-auto shrink-0"
-            />
-          </Link>
+      {/* The bar and its panel are one hover region, so crossing the seam
+          between a word and the panel it opened never closes it. Focus
+          leaving the region closes it too, which is what a keyboard reader
+          tabbing past the last destination expects. */}
+      <div
+        onPointerLeave={scheduleClose}
+        onPointerEnter={cancelClose}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closePanel();
+        }}
+        className="relative"
+      >
+        <div className="mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between gap-8 px-4.5 md:px-12">
+          <div className="flex items-center gap-10 lg:gap-12">
+            <Link
+              href="/"
+              data-cursor="nav"
+              onPointerEnter={closePanel}
+              aria-label={`${organization.shortName} — ${organization.fullName}`}
+              className="flex items-center"
+            >
+              {/* PKSF's own lockup, rendered as artwork rather than recoloured.
+                  An earlier version masked it with `currentColor` to get a
+                  reverse of it, which silently destroyed it: the hexagon's
+                  interior is opaque white in the source file, not transparent,
+                  so the mask filled the whole shape and it came out a solid
+                  blob. The mark is green on white by design and reads on both
+                  grounds the bar uses — the sunlit field and the parchment —
+                  so it is simply drawn as it is. */}
+              <Image
+                src="/images/brand/pksf-logo.png"
+                alt=""
+                aria-hidden="true"
+                width={320}
+                height={439}
+                priority
+                className="h-14 w-auto shrink-0"
+              />
+            </Link>
 
-          {/* Hidden on a phone rather than collapsed into a second control:
-              the overlay already is the phone navigation, and two ways in
-              from a 390px bar is one too many. */}
-          <nav aria-label="Sections" className="hidden sm:block">
-            <ul className="flex items-baseline gap-7 lg:gap-9">
-              {PRIMARY_LINKS.map((link) => {
-                const active = link.href === activeHref;
-                return (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      data-cursor="nav"
-                      aria-current={active ? "true" : undefined}
-                      /* No dimming for the inactive words. Over the hero the
-                         bar floats on a graded photograph where the mono is
-                         5.07:1 at full ink and under the bar at any reduced
-                         opacity, so the current section is marked by a rule
-                         instead — which is a second channel anyway, rather
-                         than a difference in lightness alone. */
-                      className="relative block font-mono text-meta uppercase transition-opacity duration-200 hover:opacity-70 motion-reduce:transition-none"
+            <nav aria-label="Primary" className="hidden lg:block">
+              <ul className="flex items-baseline gap-7 xl:gap-9">
+                {PRIMARY_NAV.map((item) => {
+                  const hasPanel = Boolean(item.children?.length);
+                  const id = panelId(item.href);
+                  return (
+                    // The `li` is deliberately **not** positioned. Its panel is
+                    // rendered inside it — which is what makes Tab go from a
+                    // word into its own destinations and then on to the next
+                    // word, rather than across all six words first — and the
+                    // panel has to size against the bar, not against a 60px
+                    // word. With the `li` static, `absolute inset-x-0 top-full`
+                    // resolves against the bar's own `relative` wrapper.
+                    <li
+                      key={item.href + item.label}
+                      onPointerEnter={() => {
+                        cancelClose();
+                        setHoveredHref(item.href);
+                        setOpenHref(hasPanel ? item.href : null);
+                      }}
                     >
-                      {link.label}
-                      {active && (
-                        <span
-                          aria-hidden="true"
-                          className="absolute -bottom-1.5 left-0 block h-px w-full bg-current"
-                        />
-                      )}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+                      <Link
+                        href={item.href}
+                        data-cursor="nav"
+                        aria-current={item.href === activeHref ? "true" : undefined}
+                        aria-expanded={hasPanel ? item.href === openHref : undefined}
+                        aria-controls={hasPanel && item.href === openHref ? id : undefined}
+                        onFocus={() => {
+                          cancelClose();
+                          setHoveredHref(item.href);
+                          setOpenHref(hasPanel ? item.href : null);
+                        }}
+                        onClick={closePanel}
+                        className="relative block font-mono text-meta uppercase"
+                      >
+                        <Magnetic>{item.label}</Magnetic>
+
+                        {item.href === markedHref && (
+                          <motion.span
+                            // One element for the whole row: Motion animates it
+                            // between the words rather than fading a rule in
+                            // under each one, which is what makes the bar read
+                            // as a single instrument.
+                            layoutId="nav-marker"
+                            aria-hidden="true"
+                            className="absolute -bottom-1.5 left-0 block h-px w-full bg-current"
+                            transition={{ duration: DURATION.small, ease: EASE_EDITORIAL }}
+                          />
+                        )}
+                      </Link>
+
+                      <AnimatePresence>
+                        {hasPanel && item.href === openHref && (
+                          <MegaMenu id={id} item={item} onNavigate={closePanel} />
+                        )}
+                      </AnimatePresence>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </div>
+
+          <div className="flex items-center gap-6 md:gap-8">
+            <button
+              type="button"
+              onClick={() => {
+                closePanel();
+                setSearchOpen(true);
+              }}
+              onPointerEnter={closePanel}
+              data-cursor="nav"
+              aria-expanded={searchOpen}
+              aria-keyshortcuts="Control+K Meta+K"
+              className="group flex items-center gap-2.5 font-mono text-meta uppercase transition-opacity duration-200 hover:opacity-60 motion-reduce:transition-none"
+            >
+              <SearchMark className="h-4 w-4 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 motion-reduce:transition-none" />
+              <span className="hidden sm:inline">Search</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                closePanel();
+                setMenuOpen(true);
+              }}
+              onPointerEnter={closePanel}
+              data-cursor="nav"
+              aria-expanded={menuOpen}
+              className="font-mono text-meta uppercase transition-opacity duration-200 hover:opacity-60 motion-reduce:transition-none"
+            >
+              Menu
+            </button>
+          </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMenuOpen(true)}
-          data-cursor="nav"
-          aria-expanded={menuOpen}
-          className="font-mono text-meta uppercase transition-opacity duration-200 hover:opacity-60 motion-reduce:transition-none"
-        >
-          Menu
-        </button>
       </div>
 
-      <SiteMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SiteMenu
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onSearch={() => {
+          setMenuOpen(false);
+          setSearchOpen(true);
+        }}
+      />
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

@@ -5,13 +5,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { GROUND } from "@/components/editorial/grounds";
-import { NAV_LINKS } from "@/components/navigation/links";
+import { PRIMARY_NAV } from "@/components/navigation/links";
+import { useOverlay } from "@/components/navigation/useOverlay";
 import { DURATION, EASE_EDITORIAL, STAGGER } from "@/components/motion/tokens";
+import { SearchMark } from "@/components/ui/Marks";
 import { organization } from "@/data/organization";
 
 type SiteMenuProps = {
   open: boolean;
   onClose: () => void;
+  /** Hands the reader to the search panel — the bar's other control, which is
+   *  not on screen while this one covers it. */
+  onSearch: () => void;
 };
 
 const g = GROUND.ink;
@@ -19,61 +24,25 @@ const g = GROUND.ink;
 /**
  * The navigation, as a full-screen editorial index.
  *
- * The bar itself carries a wordmark and one word, so the page is never
- * topped by a row of competing links. Everything else lives here, at a size
- * that makes the list of sections a composition in its own right.
+ * This is the whole navigation below `lg`, where the six words do not fit
+ * beside the wordmark — so it carries what the panels carry, opened out. Each
+ * primary destination is a row at display size with its own destinations set
+ * under it as a mono register: one tap to anything, and no disclosure to open
+ * first. Above `lg` it is the long form of the same thing.
  *
  * Focus is trapped while it is open and the page behind it cannot scroll —
  * without both, a keyboard user tabs straight out of an overlay that still
- * covers the screen.
+ * covers the screen. Both live in `useOverlay`, shared with the search panel.
  */
-export function SiteMenu({ open, onClose }: SiteMenuProps) {
+export function SiteMenu({ open, onClose, onSearch }: SiteMenuProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
+  useOverlay(open, onClose, panelRef);
+
   useEffect(() => {
-    if (!open) return;
-
-    closeRef.current?.focus();
-
-    // Lock the page behind the overlay, restoring the exact scrollbar width
-    // so nothing shifts sideways when it opens.
-    const { body, documentElement } = document;
-    const gutter = window.innerWidth - documentElement.clientWidth;
-    const previous = { overflow: body.style.overflow, paddingRight: body.style.paddingRight };
-    body.style.overflow = "hidden";
-    if (gutter > 0) body.style.paddingRight = `${gutter}px`;
-
-    function handleKey(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onClose();
-        return;
-      }
-      if (event.key !== "Tab") return;
-
-      const focusable = panelRef.current?.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled])'
-      );
-      if (!focusable?.length) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-
-    window.addEventListener("keydown", handleKey);
-    return () => {
-      window.removeEventListener("keydown", handleKey);
-      body.style.overflow = previous.overflow;
-      body.style.paddingRight = previous.paddingRight;
-    };
-  }, [open, onClose]);
+    if (open) closeRef.current?.focus();
+  }, [open]);
 
   const item = {
     hidden: { opacity: 0, y: 28 },
@@ -99,7 +68,7 @@ export function SiteMenu({ open, onClose }: SiteMenuProps) {
           aria-modal="true"
           aria-label="Site navigation"
         >
-          <div className="flex h-20 items-center justify-between px-4.5 md:px-12">
+          <div className="flex h-20 shrink-0 items-center justify-between gap-6 px-4.5 md:px-12">
             <span className="flex items-center gap-5">
               {/* The same artwork as the bar. Green on white reads on the
                   charcoal ground as well as it does on the parchment one. */}
@@ -114,18 +83,31 @@ export function SiteMenu({ open, onClose }: SiteMenuProps) {
                 Est. {organization.founded} · Bangladesh
               </span>
             </span>
-            <button
-              ref={closeRef}
-              type="button"
-              onClick={onClose}
-              data-cursor="interactive"
-              className="font-mono text-meta uppercase transition-opacity duration-200 hover:opacity-60"
-            >
-              Close
-            </button>
+
+            <span className="flex items-center gap-6 md:gap-8">
+              <button
+                type="button"
+                onClick={onSearch}
+                data-cursor="interactive"
+                className="group flex items-center gap-2.5 font-mono text-meta uppercase transition-opacity duration-200 hover:opacity-60 motion-reduce:transition-none"
+              >
+                <SearchMark className="h-4 w-4 shrink-0" />
+                Search
+              </button>
+              <button
+                ref={closeRef}
+                type="button"
+                onClick={onClose}
+                data-cursor="interactive"
+                className="font-mono text-meta uppercase transition-opacity duration-200 hover:opacity-60 motion-reduce:transition-none"
+              >
+                Close
+              </button>
+            </span>
           </div>
 
           <motion.nav
+            aria-label="All sections"
             initial="hidden"
             animate="shown"
             variants={{
@@ -135,21 +117,49 @@ export function SiteMenu({ open, onClose }: SiteMenuProps) {
             className="flex flex-1 flex-col justify-center px-4.5 py-10 md:px-12"
           >
             <ol>
-              {NAV_LINKS.map((link, i) => (
-                <motion.li key={link.href} variants={item} className={`border-t ${g.border}`}>
-                  <Link
-                    href={link.href}
-                    onClick={onClose}
-                    data-cursor="interactive"
-                    className="group flex items-baseline gap-5 py-3.5 md:gap-8 md:py-5"
-                  >
+              {PRIMARY_NAV.map((entry, i) => (
+                <motion.li
+                  key={entry.href + entry.label}
+                  variants={item}
+                  className={`border-t py-4 md:py-6 ${g.border}`}
+                >
+                  <div className="flex items-baseline gap-5 md:gap-8">
                     <span className={`font-mono text-meta uppercase ${g.muted}`}>
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <span className="font-display text-headline font-semibold uppercase tracking-tight transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-3 motion-reduce:transition-none">
-                      {link.label}
-                    </span>
-                  </Link>
+                    <Link
+                      href={entry.href}
+                      onClick={onClose}
+                      data-cursor="interactive"
+                      className="group inline-block"
+                    >
+                      <span className="block font-display text-headline font-semibold uppercase tracking-tight transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-3 group-focus-visible:translate-x-3 motion-reduce:transition-none">
+                        {entry.label}
+                      </span>
+                    </Link>
+                  </div>
+
+                  {/* The panel's destinations, set as a register rather than
+                      hidden behind a disclosure: on the measure this overlay
+                      runs at, three short labels cost one line and save a tap
+                      each. Indented to the index column so they read as
+                      belonging to the word above them. */}
+                  {entry.children && (
+                    <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-2 pl-11 md:pl-14">
+                      {entry.children.map((child) => (
+                        <li key={child.href + child.label}>
+                          <Link
+                            href={child.href}
+                            onClick={onClose}
+                            data-cursor="interactive"
+                            className={`font-mono text-meta uppercase underline-offset-4 transition-colors duration-200 hover:underline motion-reduce:transition-none ${g.muted}`}
+                          >
+                            {child.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </motion.li>
               ))}
             </ol>

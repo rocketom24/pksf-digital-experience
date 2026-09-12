@@ -13,6 +13,8 @@ import { DURATION, EASE_EDITORIAL } from "@/components/motion/tokens";
  */
 export type CursorState = "default" | "interactive" | "nav" | "view" | "explore";
 
+const FOLLOW = { stiffness: 900, damping: 40, mass: 0.2 } as const;
+
 /** Only the states that say something get a word; the rest are shape alone. */
 const LABEL: Partial<Record<CursorState, string>> = {
   nav: "Open",
@@ -63,9 +65,18 @@ export function CustomCursor() {
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  // Enough lag to feel weighted, not enough to lose the apex off the target.
-  const springX = useSpring(x, { stiffness: 520, damping: 42, mass: 0.28 });
-  const springY = useSpring(y, { stiffness: 520, damping: 42, mass: 0.28 });
+  /**
+   * Enough lag to feel weighted, not enough to lose the apex off the target.
+   *
+   * Tightened from 520/42/0.28: at that setting a fast traverse left the apex
+   * visibly trailing the real pointer, which is the one thing a pointing
+   * device cannot do — a marker drawn with its apex *on* the pointer has to be
+   * where the pointer is. Still overdamped, so it never overshoots and never
+   * wobbles to a stop: critical damping here is 2√(k·m) = 2√(900 × 0.2) ≈ 26.8
+   * and this sits at 40. The weight is in the mass, not in the lateness.
+   */
+  const springX = useSpring(x, FOLLOW);
+  const springY = useSpring(y, FOLLOW);
 
   useEffect(() => {
     const query = window.matchMedia("(pointer: fine)");

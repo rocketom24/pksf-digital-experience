@@ -13,6 +13,14 @@ type DriftProps = {
    */
   distance?: number;
   className?: string;
+  /**
+   * On the layer that actually moves. Needed when the child is an
+   * `<Image fill />`: a transform makes an element the containing block for
+   * its absolutely-positioned descendants, so the moving layer — not the
+   * ruler — is what an `fill` image resolves its box against, and a layer of
+   * `height: auto` around abspos children is a zero-height box.
+   */
+  innerClassName?: string;
 };
 
 /**
@@ -43,14 +51,19 @@ type DriftProps = {
  * client than on the server. Same mechanism as `.frame-crop` and
  * `.pointer-parallax`.
  */
-export function Drift({ children, distance = 40, className = "" }: DriftProps) {
+export function Drift({
+  children,
+  distance = 40,
+  className = "",
+  innerClassName = "",
+}: DriftProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [distance, -distance]);
 
   return (
     <div ref={ref} className={className}>
-      <motion.div className="scroll-drift" style={{ y }}>
+      <motion.div className={`scroll-drift ${innerClassName}`} style={{ y }}>
         {children}
       </motion.div>
     </div>

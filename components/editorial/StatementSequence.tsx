@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
+import { motion, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import { useRef, type ReactNode } from "react";
 import { GROUND, type Ground } from "@/components/editorial/grounds";
 import { Meta } from "@/components/editorial/SectionHead";
@@ -48,6 +48,40 @@ export function StatementSequence({
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
 
+  /**
+   * The stage runs off a softened copy of the scroll position, not the raw
+   * one. A wheel or a trackpad reports scroll in steps, and a word at display
+   * size driven straight off those steps moves in them — the type is large
+   * enough that every increment is visible as one. The spring integrates them
+   * into a continuous position, so the word travels smoothly between two
+   * notches of the wheel rather than jumping between them.
+   *
+   * It changes only how the stage reads, never how far it runs: the spring
+   * settles on whatever the scroll position actually is, so the words still
+   * resolve correctly after a fling, a scrollbar drag, or an anchor landing
+   * mid-track. Nothing is intercepted — the page still scrolls natively.
+   *
+   * It also takes this component off Motion's native scroll-timeline path
+   * (a spring is no longer a scroll value), which is what makes `clamp: true`
+   * below do what it says; see `scrollRange.ts` for why that path needs the
+   * ranges to span 0–1 exactly, which they still do.
+   *
+   * Tuned just past critical damping — 2√(k·m) is 37.9 and this sits at 40, a
+   * damping ratio of 1.05. That is deliberate on both sides. Below 1 the
+   * spring overshoots, which on this stage means a word visibly bouncing past
+   * its own window and back; well above it the spring goes sluggish, and a
+   * measured 0 → 0.5 jump took 1.4s to resolve at 160/34/0.35 — long enough
+   * that an anchor landing mid-track showed the wrong word while it caught up.
+   * At 1.05 the settling time is about 4/(ζ·ωₙ) ≈ 0.2s: long enough to
+   * integrate a wheel notch, short enough to be invisible as lag.
+   */
+  const progress = useSpring(scrollYProgress, {
+    stiffness: 360,
+    damping: 40,
+    mass: 1,
+    restDelta: 0.0005,
+  });
+
   return (
     <>
       {/* Reduced motion: the same words, stacked and static. `hidden` by
@@ -89,7 +123,7 @@ export function StatementSequence({
                   item={item}
                   index={i}
                   total={words.length}
-                  progress={scrollYProgress}
+                  progress={progress}
                   ground={ground}
                 />
               ))}
@@ -103,7 +137,7 @@ export function StatementSequence({
                   key={item.word}
                   index={i}
                   total={words.length}
-                  progress={scrollYProgress}
+                  progress={progress}
                   ground={ground}
                 />
               ))}

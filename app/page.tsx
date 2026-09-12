@@ -150,8 +150,11 @@ export default function Home() {
                 it was a six-line block in the left half of a 1,344px section
                 with nothing in the right half. Opening it to the measure is
                 the whole change — not one word of it moves. */}
+            {/* `id` on the figure, not on a new wrapper: the navigation's
+                About panel addresses the mission directly, and the element
+                that holds it is the one that should answer to `#mission`. */}
             <Reveal className="mt-20 lg:mt-28">
-              <figure className="m-0">
+              <figure id="mission" className="m-0 scroll-mt-28">
                 <Meta>The mission</Meta>
                 <blockquote className="mt-8 border-t border-on-light/14 pt-10">
                   <p className="max-w-6xl font-prose text-headline italic">

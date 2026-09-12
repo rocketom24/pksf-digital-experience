@@ -76,6 +76,18 @@ export function GlobeMark({ className = "" }: MarkProps) {
   );
 }
 
+/** A query that is run. The lens is offset up-left so the handle falls on the
+ *  optical centre of the box — a centred circle with a tail reads as sitting
+ *  high at the 16px the bar uses it at. */
+export function SearchMark({ className = "" }: MarkProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className} {...STROKE}>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="M15.3 15.3 21 21" />
+    </svg>
+  );
+}
+
 /** An address that is written to. The envelope is drawn open-flap rather than
  *  sealed, so the diagonal reads as a fold and not as a cross through a box. */
 export function MailMark({ className = "" }: MarkProps) {

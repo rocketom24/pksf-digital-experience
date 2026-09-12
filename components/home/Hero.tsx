@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from "motion/react";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, type PointerEvent } from "react";
 import { ScrollCue } from "@/components/home/ScrollCue";
 import { DURATION, EASE_EDITORIAL } from "@/components/motion/tokens";
 import { heroAsOf, heroFacts, heroImage } from "@/data/hero";
@@ -36,11 +36,12 @@ import { organization } from "@/data/organization";
  * nothing else; each zone is only as deep as the type it carries, and fades
  * from there into the picture.
  *
- * The headline is one sentence set in two voices: the claim in the display
- * grotesque at full size, and the connective clause — the part that actually
- * describes the institution — in the prose italic, set small and pushed
- * right so it reads as running *through* the statement rather than sitting
- * between two halves of it. That is the proposition about PKSF in a
+ * The headline is one sentence set in two voices — BEHIND / every hand that /
+ * REACHES. The two display words are what PKSF is and what PKSF is not: it is
+ * the institution behind the reach, and the reaching is done by a hand that is
+ * not its own. The clause that names that hand is in the prose italic, set
+ * small and pushed right, so the eye reads the two positions first and the
+ * relation between them second. That is the proposition about PKSF in a
  * typographic arrangement: an apex body whose reach is carried by someone
  * else. The block below says it plainly, and then shows the model itself, so
  * a visitor who reads nothing else still leaves knowing that PKSF finances
@@ -57,6 +58,9 @@ import { organization } from "@/data/organization";
  * Nothing in this section is set in a muted ink or at reduced opacity —
  * hierarchy is size, weight, tracking and placement. Quiet, not faint.
  */
+
+/** The lens the photograph drifts on under the pointer. Same as `PointerParallax`. */
+const LENS = { stiffness: 110, damping: 20, mass: 0.7 } as const;
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -78,6 +82,47 @@ export function Hero() {
   // The photograph is 16% taller than the frame, so it can move a tenth of
   // its own height against the scroll without ever exposing an edge.
   const drift = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
+
+  /**
+   * The pointer drift. Same idea as `PointerParallax` on the video and news
+   * frames, written out here rather than wrapped around the picture, because
+   * the picture is the bottom layer of the section and the type sits on top of
+   * it: a wrapper around the `<Image>` would only be hit where no line of type
+   * covers it, so the drift would cut in and out as the hand crossed the
+   * headline. The section is the ancestor of everything in the frame, so
+   * listening there is the only way it can follow the hand across the whole
+   * photograph.
+   *
+   * Its own layer, so it compounds with neither the entrance scale nor the
+   * scroll drift. `pointer-parallax` is the class the reduced-motion block in
+   * globals.css already cancels transforms on — the same reason it exists for
+   * the frames.
+   */
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const pointerScale = useMotionValue(1);
+  const hoverX = useSpring(pointerX, LENS);
+  const hoverY = useSpring(pointerY, LENS);
+  const hoverScale = useSpring(pointerScale, LENS);
+
+  function trackPointer(event: PointerEvent<HTMLElement>) {
+    // Mouse only. A touch pointer fires `pointermove` on a tap and then leaves
+    // the picture shoved to one side with no pointer left to bring it back.
+    if (event.pointerType !== "mouse") return;
+    const box = event.currentTarget.getBoundingClientRect();
+    // Against the hand, not with it — the frame reads as having depth rather
+    // than as a sticker being dragged.
+    pointerX.set(-((event.clientX - box.left) / box.width - 0.5) * 28);
+    pointerY.set(-((event.clientY - box.top) / box.height - 0.5) * 20);
+    pointerScale.set(1.04);
+  }
+
+  function releasePointer(event: PointerEvent<HTMLElement>) {
+    if (event.pointerType !== "mouse") return;
+    pointerX.set(0);
+    pointerY.set(0);
+    pointerScale.set(1);
+  }
 
   // Entrance only — the hero is above the fold, so this runs on mount rather
   // than on an intersection, which cannot mis-fire.
@@ -128,6 +173,8 @@ export function Hero() {
       id="top"
       data-ground="parchment"
       data-cursor="explore"
+      onPointerMove={trackPointer}
+      onPointerLeave={releasePointer}
       /* One timeline for the whole opening, rather than three blocks each
          with a hand-tuned delay of its own. The photograph is on its own
          clock and starts at zero; the type waits 0.45s, by which point the
@@ -141,7 +188,11 @@ export function Hero() {
         hidden: {},
         shown: { transition: { delayChildren: 0.45, staggerChildren: 0.14 } },
       }}
-      className="on-photo relative isolate flex min-h-[100svh] flex-col justify-between overflow-x-clip px-4.5 pb-6 pt-22 md:px-12 md:pb-7"
+      /* `pt-32` clears the fixed bar by about 48px rather than the 8px `pt-22`
+         left — the bar is ~80px deep, and a register starting directly under
+         it reads as a third row of the navigation rather than as the head of
+         the page. */
+      className="on-photo relative isolate flex min-h-[100svh] flex-col justify-between overflow-x-clip px-4.5 pb-6 pt-32 md:px-12 md:pb-7 md:pt-36"
     >
       {/* ── The photograph ─────────────────────────────────────────────────
           Two nested layers: the outer opens the mask on load, the inner
@@ -162,21 +213,26 @@ export function Hero() {
           transition={{ duration: DURATION.cinematic, ease: EASE_EDITORIAL, delay: 0.05 }}
           style={{ y: drift }}
         >
-          <Image
-            src={heroImage.src}
-            alt={heroImage.alt}
-            fill
-            priority
-            quality={88}
-            sizes="100vw"
-            /* The farmer sits at about 58% across the photograph, and he is
-               the only part of it dark enough to fight charcoal type. On a
-               tablet, where the crop is horizontal, the window is pulled
-               left so he lands further right and the type keeps the field to
-               itself; on a wide viewport the crop is vertical and only the
-               height offset does anything. */
-            className="object-cover object-[54%_38%] md:object-[34%_34%] xl:object-[center_34%]"
-          />
+          <motion.div
+            className="pointer-parallax absolute inset-0"
+            style={{ x: hoverX, y: hoverY, scale: hoverScale }}
+          >
+            <Image
+              src={heroImage.src}
+              alt={heroImage.alt}
+              fill
+              priority
+              quality={88}
+              sizes="100vw"
+              /* The farmer sits at about 58% across the photograph, and he is
+                 the only part of it dark enough to fight charcoal type. On a
+                 tablet, where the crop is horizontal, the window is pulled
+                 left so he lands further right and the type keeps the field to
+                 itself; on a wide viewport the crop is vertical and only the
+                 height offset does anything. */
+              className="object-cover object-[54%_38%] md:object-[34%_34%] xl:object-[center_34%]"
+            />
+          </motion.div>
         </motion.div>
       </motion.div>
 
@@ -200,14 +256,42 @@ export function Hero() {
         <motion.span
           aria-hidden="true"
           variants={veil}
-          className="hero-band-top pointer-events-none absolute inset-x-[-100vw] -top-22 bottom-[-11rem] -z-10"
+          /* The top offset has to match the section's own top padding, or the
+             strip between the viewport edge and where the zone starts is bare
+             photograph with the navigation sitting on it. */
+          className="hero-band-top pointer-events-none absolute inset-x-[-100vw] -top-32 bottom-[-11rem] -z-10 md:-top-36"
         />
-        <motion.p variants={fade} className="font-mono text-meta uppercase">
-          {organization.fullName}
-          <span className="mt-1 block">Est. {organization.founded} · Bangladesh</span>
+        {/* The institution's own name in its own script, opposite the English
+            register. It leads on the short name because that is the one PKSF
+            itself prints — every Bangla release in its news centre writes the
+            institution as পিকেএসএফ — and the expansion sits under it at
+            reading size. Set in `--font-bangla` (Tiro Bangla): none of the
+            three Latin faces this page uses carries Bengali at all, so Bangla
+            in them falls back to whatever the device happens to have. */}
+        <motion.p variants={fade} lang="bn" className="font-bangla">
+          <span className="block text-title font-bold leading-none">
+            {organization.banglaShortName}
+          </span>
+          <span className="mt-2 block text-body leading-snug">
+            {organization.banglaFullName}
+          </span>
         </motion.p>
+
+        {/* The English register, all of it on this side now: the legal status
+            first, because it is what the institution is, and the name and
+            founding under it as the entry that names it.
+
+            Two lines, not three. Right-aligned mono sets ragged-left, and
+            three rows of it at three different lengths reads as a stack of
+            unrelated labels; the name and the founding are one register entry
+            and belong on one line, which leaves the block as a statement and
+            the entry that names it. It wraps back to two rows below `lg`,
+            where the measure can no longer hold it. */}
         <motion.p variants={fade} className="font-mono text-meta uppercase sm:text-right">
           {organization.legalStatus.replace(/\.$/, "")}
+          <span className="mt-2 block">
+            {organization.fullName} · Est. {organization.founded} · Bangladesh
+          </span>
         </motion.p>
       </motion.div>
 
@@ -223,11 +307,15 @@ export function Hero() {
           was there to avoid. */}
       <motion.h1
         variants={{ hidden: {}, shown: { transition: { staggerChildren: 0.1 } } }}
-        className="my-1 max-w-[19ch] font-display text-colossal font-bold uppercase text-ink"
+        /* An explicit gap above, not the `justify-between` one: the section's
+           content is taller than the frame on a short viewport, so there is no
+           free space left for `justify-between` to distribute and the register
+           ends up sitting on the cap-line of the first word. */
+        className="mb-1 mt-7 max-w-[19ch] font-display text-colossal font-bold uppercase text-ink md:mt-10"
       >
         <span className="block overflow-hidden pb-[0.03em]">
           <motion.span variants={line} className="block">
-            Reach
+            Behind
           </motion.span>
         </span>
         <span className="block overflow-hidden pb-[0.05em] pl-[0.12em] md:pl-[1.2em]">
@@ -235,12 +323,12 @@ export function Hero() {
             variants={line}
             className="block font-prose text-[0.34em] font-normal normal-case italic tracking-[-0.01em]"
           >
-            that runs through
+            every hand that
           </motion.span>
         </span>
         <span className="block overflow-hidden pb-[0.03em]">
           <motion.span variants={line} className="block">
-            Others
+            Reaches
           </motion.span>
         </span>
       </motion.h1>
@@ -274,6 +362,18 @@ export function Hero() {
           An apex development organisation of the Government of Bangladesh. It
           finances and equips the Partner Organisations that reach households
           — it does not reach them itself.
+        </motion.p>
+
+        {/* The same sentence in Bangla, under the English rather than beside
+            it: this is the line repeated, not a second claim. It is this
+            page's own rendering of its own English — PKSF publishes no Bangla
+            version of it — and the colophon below says so. */}
+        <motion.p
+          variants={fade}
+          lang="bn"
+          className="mt-3 max-w-[62ch] font-bangla text-body leading-relaxed"
+        >
+          পিকেএসএফ অর্থায়ন ও সক্ষমতা জোগায়; ঘরে ঘরে পৌঁছায় সহযোগী সংস্থাগুলো।
         </motion.p>
 
         {/* The scale, as three figures. The number leads and the words
@@ -338,6 +438,22 @@ export function Hero() {
               >
                 {heroImage.license}
               </a>
+            </span>
+            {/* The Bangla carries two different provenances and the page does
+                not flatten them: the short name is PKSF's own, and the
+                expansion is not printed anywhere on pksf.org.bd. Set in the
+                Bangla face inside the mono line, because mono has no Bengali
+                either. */}
+            <span className="mt-1 block normal-case">
+              <span className="uppercase">Bangla — </span>
+              <span lang="bn" className="font-bangla">
+                পিকেএসএফ
+              </span>
+              <span className="uppercase">
+                {" "}
+                is PKSF&rsquo;s own; the expansion and the line above are this
+                page&rsquo;s rendering
+              </span>
             </span>
           </p>
         </motion.div>

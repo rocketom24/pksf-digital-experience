@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Frame } from "@/components/editorial/Frame";
+import { Drift } from "@/components/motion/Drift";
 import { GROUND } from "@/components/editorial/grounds";
 import { Plate } from "@/components/home/Plate";
 import { ProvenanceMark } from "@/components/home/ProvenanceMark";
@@ -74,19 +75,40 @@ export function StrategicInterventionCard({
         className="absolute inset-0 [&>div]:h-full"
       >
         {image.src ? (
-          <Image
-            src={image.src}
-            alt={image.alt}
-            fill
-            /* Half the measure is the widest a card in a row of three ever
-               gets — that is its hovered width, not its resting one, and
-               asking for the resting width would fetch a picture that goes
-               soft the moment it is looked at. A card alone on its row is
-               already the full measure. */
-            sizes={wide ? "100vw" : "(min-width: 768px) 50vw, 100vw"}
-            className="object-cover"
-            style={{ objectPosition: image.focal }}
-          />
+          /* The picture drifts against its own card as the row passes the
+             viewport — down the page it rises, back up it falls, and it is at
+             its laid-out position exactly once, when the card is centred.
+             That is what makes ten cards read as ten depths rather than as a
+             flat grid that happens to scroll.
+
+             It is a layer of its own rather than more movement on `Frame`'s
+             crop: the crop is a settle that finishes at scale 1, so by the
+             time the card is leaving there is no oversize left to move
+             inside. This layer is 118% of the card and hung 9% above it, so
+             its own headroom is ~9% of the card's height against 20px of
+             travel — the edge is never reachable at any card size this
+             section uses. The travel is small on purpose; a card in a row of
+             three is not a hero, and a picture that visibly slides inside a
+             tile reads as a broken sticky rather than as depth. */
+          <Drift
+            distance={20}
+            className="absolute inset-x-0 top-[-9%] h-[118%]"
+            innerClassName="h-full"
+          >
+            <Image
+              src={image.src}
+              alt={image.alt}
+              fill
+              /* Half the measure is the widest a card in a row of three ever
+                 gets — that is its hovered width, not its resting one, and
+                 asking for the resting width would fetch a picture that goes
+                 soft the moment it is looked at. A card alone on its row is
+                 already the full measure. */
+              sizes={wide ? "100vw" : "(min-width: 768px) 50vw, 100vw"}
+              className="object-cover"
+              style={{ objectPosition: image.focal }}
+            />
+          </Drift>
         ) : (
           <Plate variant={media.plate} className="h-full w-full" />
         )}
