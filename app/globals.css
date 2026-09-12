@@ -453,6 +453,36 @@
   }
 }
 
+/* ── The way back up ──────────────────────────────────────────────────────
+   The footer's back-to-top strip. The control itself is a plain anchor to the
+   top of the hero — it works with no JavaScript, moves keyboard focus the way
+   a link is supposed to, and takes its smoothness from `scroll-behavior`
+   below, which is already switched off under `prefers-reduced-motion`.
+
+   Only the exhaust lives here. Everything else the rocket does under the
+   pointer is a Tailwind `motion-safe:group-hover` on the element that does it,
+   but the flame is a path inside an imported SVG with no `group` of its own to
+   hang off, and `transform-box` on an SVG child defaults to `view-box` — so
+   the `origin-[12px_24px]` in the mark resolves in the rocket's own user
+   space, at the nozzle exit, and the flame grows downward out of it.
+
+   Scoped to a pointer that can actually hover: on a touch screen `:hover`
+   sticks after a tap, which would leave the rocket burning for the rest of the
+   session. `:focus-visible` is what gives a keyboard reader the same reply. */
+.rocket-flame {
+  transform: scaleY(0);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rocket-launch:hover .rocket-flame {
+    transform: scaleY(1);
+  }
+}
+
+.rocket-launch:focus-visible .rocket-flame {
+  transform: scaleY(1);
+}
+
 /* A section whose ground changes under user control interpolates background
    and text together, so no frame of the transition is light on light. */
 .ground-shift {
@@ -482,7 +512,10 @@
   /* The featured video's pointer drift, for the same reason and by the same
      mechanism: a spring-driven MotionValue in the inline style cannot be
      switched off by rendering a different tree without a hydration mismatch. */
-  .pointer-parallax {
+  .pointer-parallax,
+  /* Scroll parallax — `components/motion/Drift.tsx`, and the era plates
+     inside the horizontal timeline, which drift by the same mechanism. */
+  .scroll-drift {
     transform: none !important;
   }
 

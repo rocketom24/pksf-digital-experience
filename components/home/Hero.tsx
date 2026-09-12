@@ -120,6 +120,12 @@ export function Hero() {
   return (
     <motion.section
       ref={sectionRef}
+      /* The target the footer's back-to-top anchor addresses. It is an id
+         rather than a scripted `scrollTo` so the control is a real link:
+         it works with JavaScript off, it moves keyboard focus, and it takes
+         its smoothness from `scroll-behavior` in globals.css — which is
+         already cancelled under `prefers-reduced-motion`. */
+      id="top"
       data-ground="parchment"
       data-cursor="explore"
       /* One timeline for the whole opening, rather than three blocks each

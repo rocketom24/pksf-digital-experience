@@ -18,9 +18,14 @@ export type Organization = {
   mission: string;
   /** What PKSF does, restated for the page. Structural, not quoted. */
   mandate: string;
+  /** See `bangla` below — the two names in PKSF's own script. */
+  banglaFullName: string;
+  banglaShortName: string;
   headquarters: string[];
   email: string;
+  /** Telephone only. The two fax lines are `fax` — see the note below. */
   phones: string[];
+  fax: string[];
   website: string;
   sources: Record<string, string>;
 };
@@ -37,6 +42,26 @@ export const organization: Organization = {
     "To serve the low-income people to enhance their opportunities for decent employment with appropriate financial, risk mitigation, and capacity enhancement services by fostering inclusive institutions",
   mandate:
     "PKSF provides financial assistance and institutional development support to Partner Organisations, which implement its programmes and projects at grassroots level. The Partner Organisations are an integral part of PKSF's operational structure and deliver services to people across Bangladesh.",
+  /* ── The institution's own name, in its own script ──────────────────────
+     These two do not have the same provenance and the page does not pretend
+     they do.
+
+     `banglaShortName` is **PKSF's own**, off pksf.org.bd: every Bangla release
+     in its news centre writes the institution as পিকেএসএফ, in the headline and
+     in the body. It is marked Verified where it is set.
+
+     `banglaFullName` is the expansion, and pksf.org.bd does not print it —
+     not on the home page, the contact page, the about page, the news centre,
+     or its own site search for ফাউন্ডেশন. It is the standard Bangla name of
+     the institution, hyphenated exactly as PKSF hyphenates the English it
+     does publish ("Palli Karma-Sahayak Foundation" → পল্লী কর্ম-সহায়ক
+     ফাউন্ডেশন), and it is the form used in PKSF's own Bangla recruitment
+     notices and on the Bangla Wikipedia article. That is a real citation but
+     it is not a PKSF page, so the page marks it **Awaiting source** rather
+     than Verified. If a PKSF page is later found carrying it, the mark
+     changes and the string does not. */
+  banglaFullName: "পল্লী কর্ম-সহায়ক ফাউন্ডেশন",
+  banglaShortName: "পিকেএসএফ",
   headquarters: [
     "PKSF Bhaban-1",
     "Plot: E-4/B",
@@ -45,7 +70,13 @@ export const organization: Organization = {
     "Dhaka-1207",
   ],
   email: "pksf@pksf.org.bd",
-  phones: ["02222218331-33", "02222218335-39", "02222218341", "02222218343"],
+  /* PKSF's contact page lists four numbers under two headings, and this file
+     used to carry all four as `phones`. Two of them are the fax lines — the
+     page labels them as such — and printing a fax number as a telephone
+     number is exactly the kind of quiet inaccuracy the provenance system
+     exists to prevent. They are split here as PKSF publishes them. */
+  phones: ["02222218331-33", "02222218335-39"],
+  fax: ["02222218341", "02222218343"],
   website: "https://pksf.org.bd/",
   sources: {
     founding: "PKSF — About Us",
@@ -54,6 +85,102 @@ export const organization: Organization = {
     contact: "PKSF — Contact",
   },
 };
+
+/**
+ * The head office, as a place on the ground.
+ *
+ * PKSF publishes the postal address but no coordinate, so the coordinate is
+ * not PKSF's — it is the OpenStreetMap node for "Palli Karma-Sahayak
+ * Foundation", whose own address field reads `E-4/B, ICT Road, Agargaon,
+ * Dhaka, 1207`. That is the same plot number PKSF prints on its contact page,
+ * which is what makes the match verifiable rather than assumed. The footer
+ * says so on its face.
+ *
+ * ── Why this embed URL and not a Maps API one ─────────────────────────────
+ * `maps.google.com/maps?q=…&output=embed` is the keyless classic form, and it
+ * is the exact form PKSF's own contact page uses for its map — so the map in
+ * this footer is the institution's own choice of map, at a zoom that actually
+ * shows the building. It needs no API key, which means no key to leak and no
+ * billing account behind a concept site. The pin is placed by coordinate
+ * rather than by address string so it lands on the plot instead of on
+ * whatever Google geocodes the sentence to.
+ *
+ * `openUrl` is the documented Google Maps URL scheme, which is also keyless.
+ */
+export const headOffice = {
+  lat: 23.776859,
+  lng: 90.3740818,
+  /** Where the coordinate came from. Not PKSF, and labelled as such. */
+  coordinateSource: "OpenStreetMap — node 2990875215, plot E-4/B",
+  coordinateSourceUrl: "https://www.openstreetmap.org/node/2990875215",
+  embedUrl:
+    "https://maps.google.com/maps?q=23.776859,90.3740818&t=m&z=17&output=embed&iwloc=near",
+  openUrl:
+    "https://www.google.com/maps/search/?api=1&query=23.776859%2C90.3740818",
+} as const;
+
+/**
+ * Every channel PKSF publishes for itself, and no others.
+ *
+ * Facebook and YouTube are the only two social accounts linked anywhere on
+ * pksf.org.bd — there is no official LinkedIn, X or Instagram to link, and an
+ * unofficial account carrying the name is not a PKSF channel. The contact page
+ * also links a second Facebook spelling, `facebook.com/pksf.orgbd`, which
+ * redirects to the one below; the destination is what is carried here.
+ *
+ * `href` is what the reader is sent to. `detail` is what is printed, and for
+ * the telephone that is PKSF's published string verbatim, ranges and all —
+ * the `href` is the first number of the first range in international form,
+ * because a range cannot be dialled and `tel:` needs one number.
+ */
+export type ChannelKind = "facebook" | "youtube" | "website" | "email" | "phone";
+
+export type Channel = {
+  kind: ChannelKind;
+  /** What the channel is. */
+  name: string;
+  /** What is printed under the name — the handle, address or number. */
+  detail: string;
+  href: string;
+  /** True for anything that leaves this site into a new tab. */
+  external?: boolean;
+};
+
+export const channels: Channel[] = [
+  {
+    kind: "facebook",
+    name: "Facebook",
+    detail: "facebook.com/pksf.org.bd",
+    href: "https://www.facebook.com/pksf.org.bd/",
+    external: true,
+  },
+  {
+    kind: "youtube",
+    name: "YouTube",
+    detail: "Palli Karma-Sahayak Foundation [PKSF]",
+    href: "https://www.youtube.com/channel/UCoAKqvZNToAyt4ZGx8qwHYQ",
+    external: true,
+  },
+  {
+    kind: "website",
+    name: "Website",
+    detail: "pksf.org.bd",
+    href: organization.website,
+    external: true,
+  },
+  {
+    kind: "email",
+    name: "Email",
+    detail: organization.email,
+    href: `mailto:${organization.email}`,
+  },
+  {
+    kind: "phone",
+    name: "Telephone",
+    detail: organization.phones.join(" · "),
+    href: "tel:+8802222218331",
+  },
+];
 
 /**
  * The Strategic Plan 2025–2030. The three objectives are reproduced as

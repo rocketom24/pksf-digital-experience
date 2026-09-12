@@ -1,7 +1,9 @@
 import { GROUND, type Ground } from "@/components/editorial/grounds";
 import { Meta } from "@/components/editorial/SectionHead";
+import { Odometer } from "@/components/home/Odometer";
 import { ProvenanceMark } from "@/components/home/ProvenanceMark";
 import { Reveal } from "@/components/motion/Reveal";
+import { Rise } from "@/components/motion/Rise";
 import { digitalDirection, digitalHorizon, digitalMetrics } from "@/data/digital";
 
 /**
@@ -21,13 +23,21 @@ type DigitalDirectionProps = { ground?: Ground; className?: string };
  *
  * Three stages down a single ruled column, numbered because the sequence is
  * real: an organisation cannot go cashless before it goes paperless, and
- * cannot be data-intelligent before either. The capabilities below are the
- * means, set small in the mono, so the hierarchy says which is the claim and
- * which is the detail.
+ * cannot be data-intelligent before either. Each stage rises out from behind
+ * its own rule as it arrives, and carries its position in the sequence at the
+ * far edge of the measure — so a row that was a word floating in the left
+ * half of a very wide column now spans it, and the three rows read as a
+ * ladder with a direction rather than as three captions.
+ *
+ * The capabilities below are the means. They are set as a numbered register
+ * rather than as a bullet run, because a comma-separated line of five is the
+ * one shape that says "and some other things"; these are the five PKSF named.
  *
  * The two figures at the foot are delivered and are marked as verified. The
  * three stages are published direction for 2030 — PKSF has not said the
  * cashless, AI-driven end state exists today, and neither does this page.
+ * That is also why only the delivered figures roll: a count-up on a 2030
+ * stage would animate a target into looking like a reading.
  */
 export function DigitalDirection({ ground = "ink", className = "" }: DigitalDirectionProps) {
   const g = GROUND[ground];
@@ -44,69 +54,98 @@ export function DigitalDirection({ ground = "ink", className = "" }: DigitalDire
         </p>
       </Reveal>
 
-      <ol className="mt-12 md:mt-16">
+      <ol className="mt-16 md:mt-20">
         {visionStages.map((stage, i) => (
           <li key={stage} className={`border-t ${g.border}`}>
-            <Reveal delay={i * 0.12} className="flex items-start gap-6 py-8 md:gap-12 md:py-12">
-              <span className={`mt-3 shrink-0 font-mono text-meta uppercase ${g.accent}`}>
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <p className="font-display text-display font-bold uppercase text-balance">{stage}</p>
-            </Reveal>
+            <div className="flex items-baseline justify-between gap-8 py-10 md:py-14">
+              <div className="flex min-w-0 items-baseline gap-6 md:gap-12">
+                <span className={`shrink-0 font-mono text-meta uppercase ${g.accent}`}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <Rise distance={90} delay={i * 0.08}>
+                  <p className="font-display text-display font-bold uppercase text-balance">
+                    {stage}
+                  </p>
+                </Rise>
+              </div>
+
+              {/* The far edge of the measure, so the row spans the column it
+                  is in. It is the stage's own position in the published
+                  sequence, not a status — nothing here says a stage is
+                  reached. */}
+              <Reveal
+                delay={i * 0.08 + 0.12}
+                className={`hidden shrink-0 font-mono text-meta uppercase lg:block ${g.muted}`}
+              >
+                Stage {String(i + 1).padStart(2, "0")} of{" "}
+                {String(visionStages.length).padStart(2, "0")}
+              </Reveal>
+            </div>
           </li>
         ))}
         <li className={`border-t ${g.border}`} aria-hidden="true" />
       </ol>
 
-      <Reveal delay={0.12} className="mt-14">
+      <Reveal delay={0.12} className="mt-16">
         <h4>
           <Meta ground={ground}>Capabilities named in that direction</Meta>
         </h4>
-        <ul className={`mt-6 flex flex-wrap gap-x-8 gap-y-3 ${g.muted}`}>
-          {capabilities.map((item) => (
-            <li key={item} className="flex items-baseline gap-2 font-mono text-body">
-              <span aria-hidden="true" className={g.accent}>
-                ·
-              </span>
-              {item}
-            </li>
-          ))}
-        </ul>
       </Reveal>
+
+      <ul className={`mt-8 grid border-t sm:grid-cols-2 lg:grid-cols-3 ${g.border}`}>
+        {capabilities.map((item, i) => (
+          <li key={item} className={`border-b sm:odd:pr-8 lg:nth-[3n+1]:pr-8 ${g.border}`}>
+            <Reveal delay={i * 0.05} className="flex items-baseline gap-5 py-5">
+              <span className={`shrink-0 font-mono text-meta uppercase ${g.accent}`}>
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="font-display text-body font-medium">{item}</span>
+            </Reveal>
+          </li>
+        ))}
+      </ul>
 
       <ProvenanceMark
         kind="direction"
         ground={ground}
         note={`${digitalHorizon.source} — stated direction, not a delivered milestone`}
-        className="mt-12"
+        className="mt-10"
       />
 
       {/* What has actually been delivered, separated from the direction above
           by a rule so the two are never read as one claim. */}
-      <Reveal delay={0.12} className={`mt-16 border-t pt-10 ${g.border}`}>
-        <Meta ground={ground}>Delivered so far</Meta>
-        <dl className="mt-8 grid gap-10 sm:grid-cols-2">
-          {digitalMetrics.map((metric) => (
+      <div className={`mt-20 border-t pt-12 ${g.border}`}>
+        <Reveal>
+          <Meta ground={ground}>Delivered so far</Meta>
+        </Reveal>
+
+        <dl className="mt-10 grid gap-12 sm:grid-cols-2 lg:gap-20">
+          {digitalMetrics.map((metric, i) => (
             <div key={metric.label}>
-              <dt className="font-mono text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-[-0.03em]">
-                {metric.value}
+              {/* Split at the percent sign so the digits roll and the unit is
+                  painted. These two are completed measurements rather than a
+                  running balance, so arriving at them is honest. */}
+              <dt className="font-mono text-[clamp(3rem,6vw,5rem)] leading-none tracking-[-0.03em]">
+                <Odometer value={metric.value.replace("%", "")} suffix="%" />
               </dt>
-              <dd className="mt-4">
-                <span className="block font-display text-title font-semibold text-balance">
-                  {metric.label}
-                </span>
-                <span className={`mt-2 block max-w-xs text-body ${g.muted}`}>{metric.note}</span>
+              <dd className="mt-6">
+                <Rise delay={i * 0.08}>
+                  <span className="block font-display text-headline font-semibold text-balance">
+                    {metric.label}
+                  </span>
+                </Rise>
+                <span className={`mt-4 block max-w-xs text-body ${g.muted}`}>{metric.note}</span>
                 <ProvenanceMark
                   kind="verified"
                   ground={ground}
                   note={`PKSF — Digital Transformation, ${metric.asOf}`}
-                  className="mt-4"
+                  className="mt-5"
                 />
               </dd>
             </div>
           ))}
         </dl>
-      </Reveal>
+      </div>
     </div>
   );
 }

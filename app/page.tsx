@@ -1,3 +1,4 @@
+import { DeltaChannels } from "@/components/delta/DeltaChannels";
 import { Container } from "@/components/layout/Container";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
@@ -18,6 +19,7 @@ import { StrategicInterventions } from "@/components/home/StrategicInterventions
 import { Team } from "@/components/home/Team";
 import { Watch } from "@/components/home/Watch";
 import { Reveal } from "@/components/motion/Reveal";
+import { Rise } from "@/components/motion/Rise";
 import { Button } from "@/components/ui/Button";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
@@ -29,7 +31,11 @@ import { publications } from "@/data/publications";
 /** Shared vertical rhythm for the storytelling sections. */
 const RHYTHM = "py-24 md:py-32 lg:py-40";
 
+/** A zero-based position, as a two-digit index. */
 const pad = (i: number) => String(i + 1).padStart(2, "0");
+
+/** A length, as a two-digit count. Not `pad` — that takes an index. */
+const count = (n: number) => String(n).padStart(2, "0");
 
 const interventionName = (slug: string) =>
   interventions.find((item) => item.slug === slug)?.name ?? "";
@@ -44,6 +50,13 @@ const THEMES: StatementWord[] = strategicPlan.objectives.map((objective) => ({
   word: objective.label,
   gloss: objective.objective,
 }));
+
+/**
+ * The closing line, broken into the lines it was already breaking into under
+ * `max-w-[14ch]` — so each one can rise from behind its own edge instead of
+ * the block arriving whole. Same five words, same order.
+ */
+const CLOSING = ["The network", "is the", "reach"] as const;
 
 export default function Home() {
   return (
@@ -130,16 +143,22 @@ export default function Home() {
             />
 
             {/* The mission, verbatim. It is a formal commitment, so it is set
-                as a quotation rather than restated in the page's own voice. */}
+                as a quotation rather than restated in the page's own voice.
+
+                It runs to the full measure rather than to `max-w-4xl`: it is
+                the one sentence PKSF has formally committed to, and at 56rem
+                it was a six-line block in the left half of a 1,344px section
+                with nothing in the right half. Opening it to the measure is
+                the whole change — not one word of it moves. */}
             <Reveal className="mt-20 lg:mt-28">
-              <figure className="m-0 max-w-4xl">
+              <figure className="m-0">
                 <Meta>The mission</Meta>
-                <blockquote className="mt-6">
-                  <p className="font-prose text-headline italic">
+                <blockquote className="mt-8 border-t border-on-light/14 pt-10">
+                  <p className="max-w-6xl font-prose text-headline italic">
                     &ldquo;{organization.mission}&rdquo;
                   </p>
                 </blockquote>
-                <figcaption className="mt-6">
+                <figcaption className="mt-8">
                   <ProvenanceMark kind="verified" note="PKSF — Our Mission, verbatim" />
                 </figcaption>
               </figure>
@@ -217,10 +236,20 @@ export default function Home() {
 
             {/* ── Programmes ───────────────────────────────────────────── */}
             <div id="programs" className="mt-20 scroll-mt-28 lg:mt-28">
-              <h3>
-                <Meta>01 — Programmes</Meta>
-              </h3>
-              <p className="mt-6 max-w-xl text-lead text-muted">
+              {/* The same head the other indexes on this page use — an accent
+                  rule, the list's name, and how many rows are under it — so
+                  the desk's two lists are announced rather than just
+                  starting. The count is the array's length, not a typed
+                  number. */}
+              <Reveal className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-4">
+                <h3 className="flex items-center gap-3">
+                  <span aria-hidden="true" className="h-px w-8 shrink-0 bg-on-light/14" />
+                  <span className="font-mono text-meta uppercase text-clay">01 — Programmes</span>
+                </h3>
+                <Meta>{count(programs.length)} standing instruments</Meta>
+              </Reveal>
+
+              <p className="mt-8 max-w-xl text-lead text-muted">
                 The standing instruments, each filed under one of the ten
                 intervention areas. Delivered by Partner Organisations, not by
                 PKSF.
@@ -252,10 +281,15 @@ export default function Home() {
 
             {/* ── Knowledge ────────────────────────────────────────────── */}
             <div id="knowledge" className="mt-24 scroll-mt-28 lg:mt-32">
-              <h3>
-                <Meta>02 — Knowledge</Meta>
-              </h3>
-              <p className="mt-6 max-w-xl text-lead text-muted">
+              <Reveal className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-4">
+                <h3 className="flex items-center gap-3">
+                  <span aria-hidden="true" className="h-px w-8 shrink-0 bg-on-light/14" />
+                  <span className="font-mono text-meta uppercase text-clay">02 — Knowledge</span>
+                </h3>
+                <Meta>{count(publications.length)} published files</Meta>
+              </Reveal>
+
+              <p className="mt-8 max-w-xl text-lead text-muted">
                 What an apex institution publishes, and is judged on. Links go
                 to PKSF&rsquo;s own files.
               </p>
@@ -286,26 +320,55 @@ export default function Home() {
           </Container>
         </Ground>
 
-        {/* ── Final statement ──────────────────────────────────────────── */}
+        {/* ── Final statement ──────────────────────────────────────────────
+            The last thing the page says, so it is the delta's last
+            appearance too: the drawing that has carried the relay since "The
+            model" sits behind the closing line at the section's own channel
+            tone, converging upward — the network resolving back into the one
+            channel it came from. It is decorative and `aria-hidden`, and the
+            statement is fully painted without it.
+
+            The three lines are the same five words, broken where the
+            `max-w-[14ch]` measure was already breaking them, so each one can
+            rise out from behind its own edge. */}
         <Ground ground="ink">
-          <Container className="py-28 md:py-36 lg:py-44">
-            <Meta ground="ink">In closing</Meta>
-            <Reveal className="mt-10">
-              <p className="max-w-[14ch] font-display text-colossal font-bold uppercase">
-                The network is the reach
-              </p>
+          <DeltaChannels
+            branching={[5, 3]}
+            spread={1200}
+            seed={9}
+            flip
+            className="absolute inset-x-0 bottom-0 top-1/4 text-on-dark/30"
+          />
+
+          <Container className="relative py-28 md:py-36 lg:py-44">
+            <Reveal>
+              <Meta ground="ink">In closing</Meta>
             </Reveal>
-            <Reveal delay={0.12} className="mt-14 flex flex-wrap items-center gap-x-12 gap-y-6">
-              <Button href="#interventions">Explore the ten interventions</Button>
+
+            <div role="heading" aria-level={2} className="mt-12">
+              {CLOSING.map((line, i) => (
+                <Rise key={line} distance={110} delay={i * 0.1}>
+                  <span className="block font-display text-colossal font-bold uppercase">
+                    {line}
+                  </span>
+                </Rise>
+              ))}
+            </div>
+
+            <Reveal delay={0.24} className="mt-16 flex flex-wrap items-center gap-x-12 gap-y-6">
+              <Button href="#interventions" variant="solid" ground="ink">
+                Explore the ten interventions
+              </Button>
               <Button href={organization.website} target="_blank" rel="noreferrer">
                 Visit pksf.org.bd
               </Button>
             </Reveal>
+
             <ProvenanceMark
               kind="editorial"
               ground="ink"
               note="a reading of the published mandate — PKSF reaches households through its Partner Organisations"
-              className="mt-12"
+              className="mt-14 max-w-md"
             />
           </Container>
         </Ground>
