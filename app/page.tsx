@@ -11,16 +11,17 @@ import { DigitalTimeline } from "@/components/home/DigitalTimeline";
 import { Hero } from "@/components/home/Hero";
 import { HumanStory } from "@/components/home/HumanStory";
 import { ImpactLedger } from "@/components/home/ImpactLedger";
+import { News } from "@/components/home/News";
 import { Projects } from "@/components/home/Projects";
 import { ProvenanceMark } from "@/components/home/ProvenanceMark";
 import { StrategicInterventions } from "@/components/home/StrategicInterventions";
+import { Team } from "@/components/home/Team";
 import { Watch } from "@/components/home/Watch";
 import { Reveal } from "@/components/motion/Reveal";
 import { Button } from "@/components/ui/Button";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { interventions } from "@/data/interventions";
-import { news } from "@/data/news";
 import { organization, strategicPlan } from "@/data/organization";
 import { programs } from "@/data/programs";
 import { publications } from "@/data/publications";
@@ -97,6 +98,21 @@ export default function Home() {
             section is PKSF speaking in its own voice rather than another
             chapter of the page's argument. */}
         <Watch />
+
+        {/* ── The team ─────────────────────────────────────────────────────
+            Directly after the videos, and unnumbered for the same reason
+            Watch is: 01–08 are the chapters of the page's argument, and these
+            two are PKSF in its own voice and its own register. */}
+        <Team />
+
+        {/* ── News ─────────────────────────────────────────────────────────
+            Directly after the team, and unnumbered for the same reason Watch
+            and Team are: 01–08 are the chapters of the page's argument, and
+            these three are PKSF speaking for itself. It used to be a fourth
+            index inside "The desk"; it is a section now, and the index there
+            was removed rather than duplicated — `#news` can only address one
+            element. */}
+        <News />
 
         {/* The full-screen vision panel that used to sit here was removed on
             request. PKSF's vision statement is no longer set anywhere on this
@@ -193,12 +209,9 @@ export default function Home() {
             <SectionHead
               label="The desk"
               heading="The instruments, and what they are published against."
-              note="Programmes are PKSF's standing instruments. The projects running inside them are a section of their own, above."
+              note="Programmes are PKSF's standing instruments. The projects running inside them, and the releases that report on them, are sections of their own, above."
               aside={
-                <ProvenanceMark
-                  kind="verified"
-                  note="PKSF — Programs, Annual Reports and News Center"
-                />
+                <ProvenanceMark kind="verified" note="PKSF — Programs and Annual Reports" />
               }
             />
 
@@ -266,33 +279,10 @@ export default function Home() {
               </div>
             </div>
 
-            {/* ── News ─────────────────────────────────────────────────── */}
-            <div id="news" className="mt-24 scroll-mt-28 lg:mt-32">
-              <h3>
-                <Meta>03 — News</Meta>
-              </h3>
-              <p className="mt-6 max-w-xl text-lead text-muted">
-                A short, dated selection issued by PKSF. Newest first.
-              </p>
-
-              <div className="mt-12 border-b border-on-light/14">
-                {news.map((item, i) => (
-                  <IndexRow
-                    key={item.slug}
-                    index={pad(i)}
-                    title={item.title}
-                    kicker={item.displayDate}
-                    footer={
-                      <Button href={item.url} target="_blank" rel="noreferrer">
-                        Read on pksf.org.bd
-                      </Button>
-                    }
-                  >
-                    {item.summary}
-                  </IndexRow>
-                ))}
-              </div>
-            </div>
+            {/* The news used to be indexed here as a third list. It is now a
+                section of its own, directly after the team — the same
+                releases set twice on one page was one list too many, and
+                `#news` can only address one of them. */}
           </Container>
         </Ground>
 

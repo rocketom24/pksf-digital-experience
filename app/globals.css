@@ -26,15 +26,23 @@
   --forest: #006a4e; /* PKSF green — primary */
   --moss: #3f7030; /* leaf green — secondary */
 
-  /* Ink levels, one per ground. All ≥ 4.5:1 on their own ground. */
+  /* Ink levels, one per ground. All ≥ 4.5:1 on their own ground.
+
+     The muted level carries nearly everything set small — labels, provenance
+     marks, captions, section markers — so it is pulled up towards its own
+     full ink rather than sitting at the AA floor. It still has to stay a
+     *level*: on the two green grounds the full ink is only 6.26 and 5.56, so
+     there is very little room between AA and the ink itself, and the values
+     there are the most lift those grounds can take before muted stops reading
+     as quieter and starts reading as a second body colour. */
   --on-light: #073b2a; /* deep forest — 10.88 on parchment, 11.90 on paper */
-  --on-light-muted: #4a5a4e; /* 6.34 on parchment, 6.93 on paper */
+  --on-light-muted: #38483d; /* 8.39 on parchment, 9.18 on paper (was 6.34) */
   --on-dark: #fff8e8; /* 15.51 on ink */
-  --on-dark-muted: #a9bdad; /* 8.26 on ink */
+  --on-dark-muted: #c6d8ca; /* 11.00 on ink (was 8.26) */
   --on-forest: #fff8e8; /* 6.26 on forest */
-  --on-forest-muted: #c0decb; /* 4.59 on forest */
+  --on-forest-muted: #cfe8d8; /* 5.10 on forest (was 4.59) */
   --on-moss: #fff8e8; /* 5.56 on moss */
-  --on-moss-muted: #d5e8c9; /* 4.54 on moss */
+  --on-moss-muted: #e0efd6; /* 4.90 on moss (was 4.54) */
 
   /* Supporting + accent. Each accent is ground-specific: a single fixed
      accent cannot clear 3:1 on parchment, ink and forest at once. On forest
@@ -136,9 +144,21 @@
   --text-body: 1.0625rem;
   --text-body--line-height: 1.6;
 
-  --text-meta: 0.6875rem;
-  --text-meta--line-height: 1.45;
-  --text-meta--letter-spacing: 0.22em;
+  /* The one small-text size on the page — every label, section marker,
+     provenance mark, caption, count and date is set in it, so its legibility
+     is the site's legibility. It was 11px at 0.22em regular, which is a
+     hairline: at that size IBM Plex Mono's stems are under a pixel, and
+     tracking that open pulls the letters far enough apart that the eye reads
+     characters rather than words.
+
+     13px at 0.14em in the medium weight instead. The tighter tracking pays
+     for most of the extra size — a tracked-out caps string is only ~7% wider
+     than it was — so nothing that fitted before has to re-wrap, and the
+     medium is what actually puts ink on the page at this size. */
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.5;
+  --text-meta--letter-spacing: 0.14em;
+  --text-meta--font-weight: 500;
 
   /* ── Motion ───────────────────────────────────────────────────────────
      Mirrors components/motion/tokens.ts so CSS-only motion and JS motion
@@ -183,11 +203,11 @@
    and the halo is only there for the places the picture goes dark, the
    farmer's shawl and the shaded foreground, where it separates the
    letterform from behind. Four stops: the inner two keep the edge crisp at
-   11px, the outer two lift the character off a busy ground.
+   meta size, the outer two lift the character off a busy ground.
 
    `color` and `text-shadow` both inherit, so this goes on the section once.
-   The statement adds a real stroke on top, which large type can carry and
-   11px mono cannot. */
+   The statement adds a real stroke on top, which large type can carry and the
+   meta mono cannot. */
 .on-photo {
   /* Charcoal rather than deep forest. Against a sunlit field the green ink
      that reads perfectly well on parchment starts to belong to the
@@ -208,9 +228,10 @@
     0 0 24px rgb(255 248 232 / 0.8);
 }
 
-/* The mono goes up a weight on the photograph. At 11px with 0.22em tracking
-   the regular is a hairline, and a halo that thick eats into it — the medium
-   holds its stroke against the outline instead of being absorbed by it. */
+/* The mono goes up a weight on the photograph. `text-meta` is already medium
+   everywhere, so this only still catches mono that is not set in that token —
+   and it is the reason the rule stays: a halo this thick eats into a regular
+   stroke, and the medium holds its own against the outline. */
 .on-photo .font-mono {
   font-weight: 500;
 }
@@ -218,10 +239,10 @@
 /* ── The two readability zones ────────────────────────────────────────────
    The statement carries itself on the bare photograph — at that size the
    charcoal is 13.6:1 on the field's brightest pixel and the halo covers the
-   rest. The 11px mono cannot: measuring the rendered frame rather than the
-   source file, the worst ground the picture puts under the head is
-   rgb(64,74,0) and under the foot rgb(55,43,3), where haloed charcoal is
-   1.7:1 and 1.2:1 unaided.
+   rest. The meta mono cannot, at any size this page would set it: measuring
+   the rendered frame rather than the source file, the worst ground the picture
+   puts under the head is rgb(64,74,0) and under the foot rgb(55,43,3), where
+   haloed charcoal is 1.7:1 and 1.2:1 unaided.
 
    So the head and the foot each take a ground of their own, and the middle —
    the statement, the farmer, the field — is left alone. The two ends are not

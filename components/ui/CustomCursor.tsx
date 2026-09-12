@@ -165,7 +165,7 @@ export function CustomCursor() {
             transition={{ duration: DURATION.fast, ease: EASE_EDITORIAL }}
             // A solid chip, not text on whatever is behind it: over the hero
             // photograph a bare word is unreadable half the time.
-            className="mt-1.5 whitespace-nowrap rounded-full px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.18em]"
+            className="mt-1.5 whitespace-nowrap rounded-full px-2.5 py-1 font-mono text-xs font-medium uppercase tracking-[0.14em]"
             style={{ backgroundColor: back, color: ink }}
           >
             {label}

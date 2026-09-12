@@ -5,11 +5,13 @@ const nextConfig: NextConfig = {
     /* The hero is a 3200px photograph and is the single heaviest thing the
        page loads. AVIF first, WebP for the browsers without it. */
     formats: ["image/avif", "image/webp"],
-    /* YouTube thumbnails, for the Watch section. The files are PKSF's own
-       uploads and are served from YouTube's image host; this is the only
-       remote origin the page loads an image from. */
+    /* Two remote origins, both serving files PKSF uploaded itself:
+       YouTube's image host for the Watch section's thumbnails, and PKSF's own
+       media library for the staff portraits in the Team section. Nothing else
+       is loaded from anywhere else. */
     remotePatterns: [
       { protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" },
+      { protocol: "https", hostname: "pksf.org.bd", pathname: "/wp-content/uploads/**" },
     ],
   },
 };

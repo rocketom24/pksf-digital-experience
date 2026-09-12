@@ -68,7 +68,11 @@ export function ImpactLedger({ ground = "ink", className = "" }: ImpactLedgerPro
                   </span>
                 )}
               </dt>
-              <dd className={`font-mono text-sm sm:text-right ${g.accent}`}>{metric.value}</dd>
+              {/* The figure itself, so it is set at reading size rather than
+                  at label size — it is the answer the row exists to give. */}
+              <dd className={`font-mono text-body font-medium sm:text-right ${g.accent}`}>
+                {metric.value}
+              </dd>
             </Reveal>
           ))}
         </dl>

@@ -16,7 +16,7 @@ type AsLink = CommonProps & AnchorHTMLAttributes<HTMLAnchorElement> & { href: st
 type AsButton = CommonProps & ButtonHTMLAttributes<HTMLButtonElement> & { href?: undefined };
 
 const BASE =
-  "group relative inline-flex items-center gap-3 font-display text-sm font-medium disabled:pointer-events-none disabled:opacity-50";
+  "group relative inline-flex items-center gap-3 font-display text-body font-medium disabled:pointer-events-none disabled:opacity-50";
 
 /**
  * Two shapes of action, and no third.

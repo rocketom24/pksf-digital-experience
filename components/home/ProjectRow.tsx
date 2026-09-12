@@ -162,10 +162,10 @@ export function ProjectRow({
                 display size immediately to the right, so nothing is lost. */}
             {!media.image.src && (
               <span className="pointer-events-none absolute inset-0 flex flex-col justify-between p-3">
-                <span className="font-mono text-[9px] font-medium uppercase tracking-[0.2em] opacity-70">
+                <span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] opacity-85">
                   {pad(index + 1)}
                 </span>
-                <span className="font-display text-xs font-semibold uppercase leading-none tracking-tight">
+                <span className="font-display text-sm font-semibold uppercase leading-none tracking-tight">
                   {project.name}
                 </span>
               </span>

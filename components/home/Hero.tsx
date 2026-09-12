@@ -18,7 +18,7 @@ import { organization } from "@/data/organization";
  * through the middle, a sentence and three figures along the foot.
  *
  * The statement sits on the bare picture, in charcoal: at that size it is
- * 13.6:1 on the field's brightest pixel. The 11px mono cannot — it is a
+ * 13.6:1 on the field's brightest pixel. The meta mono cannot — it is a
  * mustard field in full sun, and the worst ground it offers the head is
  * rgb(64,74,0) and the foot rgb(55,43,3), where haloed charcoal is 1.7:1 and
  * 1.2:1. So the two ends of the frame take a readability zone each
@@ -289,7 +289,14 @@ export function Hero() {
                 <span className="block font-display text-headline font-bold leading-none tracking-tight">
                   {fact.value}
                 </span>
-                <span className="mt-2 block font-mono text-meta uppercase">{fact.label}</span>
+                {/* Two lines reserved at `lg`, where the three columns are
+                    narrow enough that PARTNER ORGANISATIONS wraps and the
+                    other two do not — without it the note under the first
+                    figure drops a line below its neighbours and the three
+                    stop reading as one row. */}
+                <span className="mt-2 block font-mono text-meta uppercase lg:min-h-[2lh]">
+                  {fact.label}
+                </span>
                 <span className="mt-1.5 block max-w-[30ch] text-body">{fact.note}</span>
               </dd>
             </div>

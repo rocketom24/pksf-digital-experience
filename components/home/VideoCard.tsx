@@ -170,7 +170,7 @@ export function VideoCard({ video, featured = false, index, total }: VideoCardPr
             <YouTubeMark className={featured ? "size-4 shrink-0" : "size-3 shrink-0"} />
             <span
               className={`font-display font-semibold leading-none tracking-tight text-on-dark ${
-                featured ? "text-xs" : "text-[10px]"
+                featured ? "text-sm" : "text-xs"
               }`}
             >
               YouTube

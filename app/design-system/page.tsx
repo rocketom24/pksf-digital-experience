@@ -37,7 +37,7 @@ const GROUNDS: {
     hex: "#F5EEDC",
     role: "Soft cream. The light ground — reading, indexes, the desk.",
     text: "deep forest 10.88:1",
-    muted: "6.34:1",
+    muted: "8.39:1",
     accent: "clay 5.57:1",
   },
   {
@@ -45,7 +45,7 @@ const GROUNDS: {
     hex: "#FFF8E8",
     role: "Warm paper. Insets and one intervention.",
     text: "deep forest 11.90:1",
-    muted: "6.93:1",
+    muted: "9.18:1",
     accent: "clay 6.09:1",
   },
   {
@@ -53,7 +53,7 @@ const GROUNDS: {
     hex: "#10231C",
     role: "Charcoal. Statements, ledger, close.",
     text: "paper 15.51:1",
-    muted: "8.26:1",
+    muted: "11.00:1",
     accent: "ember 7.33:1",
   },
   {
@@ -61,7 +61,7 @@ const GROUNDS: {
     hex: "#006A4E",
     role: "PKSF green. Primary — the delta, the vision.",
     text: "paper 6.26:1",
-    muted: "4.59:1",
+    muted: "5.10:1",
     accent: "gold 4.70:1",
   },
   {
@@ -69,7 +69,7 @@ const GROUNDS: {
     hex: "#3F7030",
     role: "Leaf green. Secondary — land, growth, the human story.",
     text: "paper 5.56:1",
-    muted: "4.54:1",
+    muted: "4.90:1",
     accent: "mist 4.91:1",
   },
 ];
@@ -95,7 +95,7 @@ const TYPE_SCALE = [
   { token: "text-title", clamp: "1.5rem → 2.25rem", use: "Names in a list, ledger rows." },
   { token: "text-lead", clamp: "1.125rem → 1.375rem", use: "Lead prose, in the serif." },
   { token: "text-body", clamp: "1.0625rem", use: "Body prose." },
-  { token: "text-meta", clamp: "0.6875rem", use: "Mono metadata, uppercase, 0.22em." },
+  { token: "text-meta", clamp: "0.8125rem", use: "Mono metadata, uppercase, 0.14em, medium." },
 ];
 
 const PROVENANCE: Provenance[] = ["verified", "editorial", "direction", "pending"];
@@ -241,7 +241,7 @@ export default function DesignSystem() {
                     key={`${name}-${i}`}
                     className={`flex flex-1 items-end p-2 ${g.bg} ${g.text}`}
                   >
-                    <span className="font-mono text-[9px] uppercase tracking-[0.15em] opacity-70">
+                    <span className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] opacity-90">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                   </li>

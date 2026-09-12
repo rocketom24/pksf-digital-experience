@@ -67,7 +67,7 @@ export function SectionHead({
             accident rather than a decision. */}
         {note && (
           <div className="max-w-xs sm:ml-auto">
-            <p className={`font-display text-sm font-medium ${g.text}`}>{note}</p>
+            <p className={`font-display text-body font-medium ${g.text}`}>{note}</p>
             {aside && <div className="mt-3">{aside}</div>}
           </div>
         )}

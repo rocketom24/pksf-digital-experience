@@ -9,11 +9,11 @@
  * colour, which is what kept unreadable pairings out of Phase 3.
  *
  * Ratios (measured, see the palette comment in app/globals.css):
- *   parchment  ink 10.88 · muted 6.34 · clay 5.57 · terracotta 3.25 (large/UI)
- *   paper      ink 11.90 · muted 6.93 · clay 6.09
- *   ink        paper 15.51 · muted 8.26 · ember 7.33
- *   forest     paper 6.26 · muted 4.59 · gold 4.70
- *   moss       paper 5.56 · muted 4.54 · mist 4.91
+ *   parchment  ink 10.88 · muted 8.39 · clay 5.57 · terracotta 3.25 (large/UI)
+ *   paper      ink 11.90 · muted 9.18 · clay 6.09
+ *   ink        paper 15.51 · muted 11.00 · ember 7.33
+ *   forest     paper 6.26 · muted 5.10 · gold 4.70
+ *   moss       paper 5.56 · muted 4.90 · mist 4.91
  */
 export type Ground = "parchment" | "paper" | "ink" | "forest" | "moss";
 

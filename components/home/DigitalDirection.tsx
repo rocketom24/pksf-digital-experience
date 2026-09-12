@@ -64,7 +64,7 @@ export function DigitalDirection({ ground = "ink", className = "" }: DigitalDire
         </h4>
         <ul className={`mt-6 flex flex-wrap gap-x-8 gap-y-3 ${g.muted}`}>
           {capabilities.map((item) => (
-            <li key={item} className="flex items-baseline gap-2 font-mono text-sm">
+            <li key={item} className="flex items-baseline gap-2 font-mono text-body">
               <span aria-hidden="true" className={g.accent}>
                 ·
               </span>
