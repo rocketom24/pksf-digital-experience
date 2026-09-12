@@ -44,6 +44,15 @@ type FrameProps = {
   /** Mono caption under the frame. Say what the image is, not how it looks. */
   caption?: ReactNode;
   className?: string;
+  /**
+   * Classes for the media box itself rather than the figure around it. The one
+   * thing it is for is a height ceiling: `ratio` sets the box from its width,
+   * and inside a composition that has to fit the window — the pinned timeline —
+   * a `max-h` in `vh` is what lets the picture give way instead of pushing the
+   * panel's own caption off the screen. `max-height` wins over `aspect-ratio`,
+   * so the frame simply crops rather than changing shape.
+   */
+  mediaClassName?: string;
 };
 
 /**
@@ -69,6 +78,7 @@ export function Frame({
   overlay,
   caption,
   className = "",
+  mediaClassName = "",
 }: FrameProps) {
   const ref = useRef<HTMLDivElement>(null);
   const g = GROUND[ground];
@@ -99,7 +109,7 @@ export function Frame({
         ref={ref}
         className={`relative isolate w-full overflow-hidden ${mask ? "frame-mask" : ""} ${
           RATIO[ratio]
-        } ${g.dark ? "bg-on-dark/6" : "bg-on-light/5"}`}
+        } ${g.dark ? "bg-on-dark/6" : "bg-on-light/5"} ${mediaClassName}`}
         style={mask ? { clipPath } : undefined}
       >
         <motion.div

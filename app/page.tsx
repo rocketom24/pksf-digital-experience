@@ -27,6 +27,17 @@ import { interventions } from "@/data/interventions";
 import { organization, strategicPlan } from "@/data/organization";
 import { programs } from "@/data/programs";
 import { publications } from "@/data/publications";
+import type { Metadata } from "next";
+
+/**
+ * The canonical is set per page rather than on the layout on purpose: a
+ * `canonical` on the root layout is inherited by every route added under it,
+ * which would have that route declare itself a duplicate of the home page.
+ * Everything else this page needs is inherited from the layout unchanged.
+ */
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 /** Shared vertical rhythm for the storytelling sections. */
 const RHYTHM = "py-24 md:py-32 lg:py-40";

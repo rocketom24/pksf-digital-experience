@@ -76,7 +76,11 @@ export function MegaMenu({ item, onNavigate, id }: MegaMenuProps) {
       animate="shown"
       exit="gone"
       data-ground="parchment"
-      className="absolute inset-x-0 top-full border-b border-on-light/12 bg-parchment text-on-light"
+      // The `.compact` rules are the contracted bar's: once the page has
+      // scrolled the bar is an inset panel with an edge all the way round, so
+      // what hangs off it has to carry the same two sides and the same corner
+      // or the panel reads as a separate box that happens to be underneath.
+      className="absolute inset-x-0 top-full border-b border-on-light/12 bg-parchment text-on-light in-[.compact]:rounded-b-2xl in-[.compact]:border-x in-[.compact]:border-x-on-light/12"
     >
       <Container className="py-12 lg:py-16">
         <div className="grid gap-x-16 gap-y-10 lg:grid-cols-12">

@@ -47,7 +47,7 @@ export function Ground({
       /* Read by the custom cursor, which has to pick an ink that contrasts
          with whatever ground it is currently over. */
       data-ground={ground}
-      className={`relative isolate overflow-x-clip ${g.bg} ${g.text} ${id ? "scroll-mt-16" : ""} ${className}`}
+      className={`relative isolate overflow-x-clip ${g.bg} ${g.text} ${id ? "scroll-mt-24" : ""} ${className}`}
     >
       {rule && <span aria-hidden="true" className={`absolute inset-x-0 top-0 h-px ${g.rule}`} />}
 

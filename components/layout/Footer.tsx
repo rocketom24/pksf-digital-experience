@@ -546,13 +546,6 @@ export function Footer() {
                 pksf.org.bd
                 <span className="sr-only"> — opens in a new tab</span>
               </a>
-              <Link
-                href="/design-system"
-                data-cursor="nav"
-                className={`block py-1.5 font-display text-body underline-offset-4 transition-colors duration-200 hover:underline motion-reduce:transition-none ${g.muted} hover:text-on-forest`}
-              >
-                Design system
-              </Link>
             </Stagger>
           </div>
 

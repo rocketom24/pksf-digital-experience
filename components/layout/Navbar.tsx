@@ -140,25 +140,47 @@ export function Navbar() {
       // containing block for the fixed overlays below, trapping them inside
       // the bar instead of the viewport.
       data-ground="parchment"
-      className={`fixed inset-x-0 top-0 z-40 transition-colors duration-300 motion-reduce:transition-none ${
-        light
-          ? "border-b border-on-light/12 bg-parchment/95 text-on-light"
-          : "on-photo border-b border-transparent bg-transparent"
-      }`}
+      className="fixed inset-x-0 top-0 z-40"
     >
       {/* The bar and its panel are one hover region, so crossing the seam
           between a word and the panel it opened never closes it. Focus
           leaving the region closes it too, which is what a keyboard reader
-          tabbing past the last destination expects. */}
+          tabbing past the last destination expects.
+
+          This element is also what the bar *is*, once the page has moved: at
+          the top it is the full measure of the window, and after 24px of
+          scroll it contracts to an inset panel with its own edge. That is not
+          decoration — the bar is opaque and fixed, so everything it does not
+          cover is content the reader gets back. The horizontal timeline in
+          "Digital transformation" is where that is worth the most: its panels
+          are centred in the window, and the top line of each one — the index
+          and its "Delivered" label — used to pass behind a full-width bar.
+
+          The panels below are `absolute inset-x-0` against this box, so they
+          take the contracted measure with it and stay attached to the bar. */}
       <div
         onPointerLeave={scheduleClose}
         onPointerEnter={cancelClose}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closePanel();
         }}
-        className="relative"
+        className={`relative mx-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+          scrolled
+            ? "compact mt-2.5 w-[calc(100%-1.5rem)] max-w-[1180px] rounded-2xl md:w-[calc(100%-4rem)]"
+            : "mt-0 w-full max-w-[1440px] rounded-none"
+        } ${open ? "rounded-b-none" : ""} ${
+          light
+            ? `border border-on-light/12 bg-parchment text-on-light ${
+                scrolled ? "shadow-[0_10px_40px_-24px_rgba(20,20,18,0.55)]" : "border-x-transparent border-t-transparent"
+              }`
+            : "on-photo border border-transparent bg-transparent"
+        }`}
       >
-        <div className="mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between gap-8 px-4.5 md:px-12">
+        <div
+          className={`flex w-full items-center justify-between gap-8 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+            scrolled ? "h-14 px-5 md:px-8" : "h-20 px-4.5 md:px-12"
+          }`}
+        >
           <div className="flex items-center gap-10 lg:gap-12">
             <Link
               href="/"
@@ -182,7 +204,9 @@ export function Navbar() {
                 width={320}
                 height={439}
                 priority
-                className="h-14 w-auto shrink-0"
+                className={`w-auto shrink-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+                  scrolled ? "h-10" : "h-14"
+                }`}
               />
             </Link>
 

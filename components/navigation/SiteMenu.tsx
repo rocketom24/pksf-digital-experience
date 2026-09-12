@@ -164,22 +164,11 @@ export function SiteMenu({ open, onClose, onSearch }: SiteMenuProps) {
               ))}
             </ol>
 
-            <motion.div
-              variants={item}
-              className={`mt-14 flex flex-col gap-5 border-t pt-8 sm:flex-row sm:items-start sm:justify-between ${g.border}`}
-            >
+            <motion.div variants={item} className={`mt-14 border-t pt-8 ${g.border}`}>
               <p className={`max-w-md font-mono text-meta uppercase ${g.muted}`}>
                 An independent, unofficial concept. Not affiliated with, endorsed
                 by, or representative of {organization.fullName}.
               </p>
-              <Link
-                href="/design-system"
-                onClick={onClose}
-                data-cursor="interactive"
-                className={`font-mono text-meta uppercase underline-offset-4 hover:underline ${g.accent}`}
-              >
-                Design system
-              </Link>
             </motion.div>
           </motion.nav>
         </motion.div>

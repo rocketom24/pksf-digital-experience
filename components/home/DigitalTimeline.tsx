@@ -176,12 +176,21 @@ function EraPanel({ index, total, era, ground, plate, progress }: EraPanelProps)
      back to the drawn plate if a slot is ever emptied. */
   const media = digitalEraMedia[era.period];
 
+  /* Inside the pinned track the panel has to fit the window, and the picture
+     is the only part of it that can give. A 46vw frame at 16:9 is 353px on a
+     1366px screen, which on a 768px-tall one leaves the panel ~70px taller
+     than the box it is centred in — and an overflowing centred box loses its
+     *top* line, the index and its "Delivered" label, behind the fixed bar.
+     Capping the media in `vh` makes the frame crop instead, so every line of
+     type stays on screen at every viewport height. The vertical composition
+     below `lg` is a normal scrolling sequence and gets no cap. */
   const frame = (
     <Frame
       ratio="wide"
       plate={plate}
       ground={ground}
       className="mt-6"
+      mediaClassName={progress ? "max-h-[32vh]" : ""}
       caption={media?.src ? media.caption : undefined}
     >
       {media?.src ? (
